@@ -111,8 +111,10 @@ Todas as perguntas são de texto livre.
 12. Onde você almoça? Lancha? Janta? Leva comida ou come em self-service?
 13. Metas (hidratação, sono, exercícios etc.)
 
-> Os prints mostram o trecho de "Observações" até "Metas". Confirmar se há
-> perguntas antes ou depois desse trecho.
+> A anamnese tem só essas perguntas: as demais ficam na **pré-consulta**, um
+> questionário separado que o paciente responde antes (RF-23). Durante a
+> consulta, o nutricionista precisa ver as respostas da pré-consulta junto com a
+> anamnese. Falta levantar as perguntas da pré-consulta.
 
 ### 4.5 Avaliação antropométrica e composição corporal
 
@@ -285,7 +287,7 @@ informado. **Não cancelar a Nutrio antes de concluir e validar a migração.**
 
 ## 8. Pontos em aberto
 
-1. Há perguntas da anamnese antes de "Observações" ou depois de "Metas"?
+1. Perguntas do questionário de pré-consulta atual (prints, como os da anamnese).
 2. A lista de fórmulas dos prints está completa?
 3. Resposta da Nutrio ao pedido de portabilidade: formato e dados incluídos.
 4. Prazo de guarda de prontuário exigido para nutrição — confirmar a norma vigente do CFN.
