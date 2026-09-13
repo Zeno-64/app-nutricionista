@@ -76,13 +76,15 @@ três pacotes, painel e app empacotam, console do navegador sem erro.
    `journals.plos.org` e os demais) — ver `docs/verificacao-formulas.md`.
    Precisa de máquina com acesso aberto, ou liberar esses domínios.
 2. **Sem Docker no ambiente,** o Supabase local não sobe. As migrations rodam e
-   são testadas num Postgres comum, com o shim de
-   `supabase/testes/00_shim_supabase.sql` (`npm run db:teste`).
+   são testadas num Postgres comum: `./supabase/testes/subir-postgres.sh` e
+   depois `npm run db:teste`, que usa o shim de
+   `supabase/testes/00_shim_supabase.sql`.
 3. **A rede da sessão em nuvem recusa `*.supabase.co`,** então o navegador
    daqui não alcança o projeto. O painel e o app não puderam ser exercitados
    ponta a ponta a partir deste ambiente — na máquina do Kevin funcionam com
    `npm run web`. As telas foram conferidas rodando o painel de verdade e
-   interceptando as respostas HTTP com os mesmos dados do banco.
+   interceptando as respostas HTTP com os mesmos dados do banco —
+   `apps/web/testes/telas.mjs` faz isso e serve para repetir a conferência.
 
    **O esquema está aplicado no projeto de desenvolvimento** desde 2026-09-13,
    com dados de demonstração e contas de teste — ver `supabase/README.md`.

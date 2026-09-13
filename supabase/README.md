@@ -8,8 +8,13 @@ Postgres do Supabase, multi-tenant, com isolamento por RLS.
 RNF-04), Postgres 17. O esquema todo está aplicado lá desde 2026-09-13, com
 dados de demonstração.
 
-URL e chave anônima ficam no `.env` da raiz, que está no `.gitignore`. Para
-ligar o painel:
+URL e chave anônima ficam no `.env` da raiz, que está no `.gitignore` — e por
+isso **não sobrevivem a um ambiente novo**. Para remontar: a URL é
+`https://igsbxhvoqqpuioajpfpi.supabase.co` e a chave anônima sai em
+Project Settings → API Keys, no painel do Supabase. O formato está em
+`.env.example`.
+
+Para ligar o painel:
 
 ```sh
 npm run web        # http://127.0.0.1:5173
@@ -50,9 +55,11 @@ Sem Docker (é o caso do ambiente de nuvem onde parte disto foi escrita), dá
 para aplicar e testar num Postgres comum:
 
 ```sh
-# sobe um cluster qualquer na porta 5433 e então:
+./supabase/testes/subir-postgres.sh   # cria e sobe um cluster na porta 5433
 npm run db:teste
 ```
+
+O cluster não sobrevive ao fim do contêiner; rodar o script de novo recria.
 
 O script `testes/recriar.sh` derruba o banco de teste, recria, aplica o shim,
 todas as migrations em ordem e os testes de RLS. Passe `--sem-testes` para só
