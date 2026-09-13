@@ -7,11 +7,11 @@
     "desenvolvimento": {
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "desenvolvimento"
+      "environment": "development"
     },
     "teste": {
       "distribution": "internal",
-      "channel": "teste",
+      "environment": "preview",
       "android": {
         "buildType": "apk"
       },
@@ -20,8 +20,8 @@
       }
     },
     "producao": {
-      "channel": "producao",
-      "autoIncrement": true
+      "autoIncrement": true,
+      "environment": "production"
     }
   },
   "submit": {

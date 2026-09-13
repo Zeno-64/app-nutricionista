@@ -9,9 +9,11 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.appnutricionista.nutri"
     },
     "android": {
+      "package": "com.appnutricionista.nutri",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

@@ -162,9 +162,10 @@ relatório.
 
 ### 7. Antes de publicar nas lojas
 
-- Nome do app e identificador — o `app.json` está com `Nutri` /
-  `app-nutricionista` / `appnutricionista` como provisórios, e o identificador
-  **não muda depois de publicado**
+- Nome do app e identificador — o `app.json` está com `Nutri` e
+  `com.appnutricionista.nutri` como provisórios. Trocar é de graça enquanto for
+  só build de teste; depois de publicado numa loja, o identificador **não muda
+  mais**
 - Ícone e splash próprios, no lugar dos do template
 - Política de privacidade publicada — Apple e Google exigem, e o app trata dado
   de saúde

@@ -42,38 +42,94 @@ salvamento.
 **O que isso não pega:** ícone e nome próprios, splash, notificação push e
 login por biometria — tudo isso é do app instalado, não do Expo Go.
 
-## 3. Instalado no celular, sem passar pela loja
+## 3. Instalado no celular — e mandado para outra pessoa
 
-Aqui o app vira um arquivo instalável de verdade, com ícone e nome. É o que
-serve para você usar no dia a dia e para entregar a um paciente de teste. Usa o
-**EAS Build**, o serviço de build da Expo — a compilação acontece na nuvem
-deles, não é preciso ter Android Studio nem Mac.
+Aqui o app vira um arquivo instalável de verdade, com ícone e nome, que você
+manda por link para quem vai testar. **É o EAS Build que resolve isso**, com o
+que a Expo chama de *distribuição interna*: o build sai da nuvem deles e vira um
+link, sem passar por loja nenhuma. Não precisa de Android Studio nem de Mac.
 
-Uma vez só, crie uma conta em https://expo.dev e:
+O passo a passo está em [Mandar o app para o cliente
+testar](#mandar-o-app-para-o-cliente-testar), logo abaixo — é a mesma coisa,
+só que contada do começo.
+
+## Mandar o app para o cliente testar
+
+Sim, o Expo resolve — mas resolve **bem no Android e caro no iPhone**. Vale
+saber a diferença antes de começar.
+
+| | Android | iPhone |
+|---|---|---|
+| Como chega | Link do EAS, abre e instala o APK | TestFlight |
+| Custo | Zero, fora a fila do plano gratuito do EAS | **US$ 99/ano** da conta Apple Developer |
+| Espera | Minutos | Minutos, mais o processamento da Apple |
+| Atualizar | Novo link a cada build | Aparece sozinho no TestFlight |
+
+**Não existe caminho gratuito para o iPhone.** Nem TestFlight nem distribuição
+interna funcionam sem a conta paga — a interna ainda exige registrar o aparelho
+de cada testador. Sem pagar, no iPhone só resta o Expo Go, que precisa do seu
+computador rodando o servidor: serve para você mostrar o app, não para deixar
+alguém usar por conta.
+
+### Uma vez só
+
+Crie uma conta em https://expo.dev e, na raiz do projeto:
 
 ```sh
-npx eas-cli login
-npx eas-cli build:configure
+npm install -g eas-cli
+eas login
+cd apps/mobile && eas init      # cria o projeto e grava o id no app.json
 ```
 
-Depois, a cada versão que quiser testar:
+**As chaves do Supabase precisam ir para o EAS.** É o passo que mais dá errado:
+as variáveis `EXPO_PUBLIC_*` são embutidas no momento do build, e o `.env` não
+vai para o repositório nem para a nuvem. Sem isso o build termina bem e o app
+abre dizendo que falta configurar o Supabase.
 
 ```sh
-# Android: sai um .apk para instalar direto no aparelho
-npx eas-cli build --profile teste --platform android
-
-# iPhone: exige conta paga de desenvolvedor Apple (US$ 99/ano) e vai pelo
-# TestFlight; sem ela, o iPhone só roda pelo Expo Go
-npx eas-cli build --profile teste --platform ios
+eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_URL --value "https://igsbxhvoqqpuioajpfpi.supabase.co"
+eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "<a chave anônima>"
 ```
 
-Ao terminar, o EAS devolve um link. No Android, abrir o link no celular baixa e
-instala o APK. Os perfis de build estão em `apps/mobile/eas.json`:
-`desenvolvimento` (com ferramentas de depuração), `teste` (o que você quer aqui)
-e `producao` (para as lojas).
+O perfil `teste` do `eas.json` aponta para o ambiente `preview`, então é de lá
+que ele lê. `eas env:list` confere o que ficou gravado.
 
-> O plano gratuito do EAS tem fila e um limite de builds por mês. Para testar
-> algumas versões por mês, sobra.
+### A cada versão
+
+```sh
+cd apps/mobile
+eas build --profile teste --platform android
+```
+
+O EAS devolve um link (também fica em https://expo.dev, no painel do projeto).
+Mande esse link para o cliente: ele abre no celular, baixa e instala. O Android
+pergunta se aceita instalar de fora da Play Store — é normal e ele só precisa
+confirmar.
+
+Para iPhone, depois de pagar a conta Apple:
+
+```sh
+eas build --profile teste --platform ios --auto-submit
+```
+
+Daí o cliente instala o **TestFlight** na App Store e aceita o convite que
+chega por e-mail. As versões seguintes aparecem sozinhas para ele.
+
+### Antes de mandar, confira
+
+- **O identificador do app** está provisório: `com.appnutricionista.nutri`, no
+  `app.json`. Enquanto for só teste, mudar é de graça — depois de publicado numa
+  loja, **não muda mais**. Decida antes da primeira publicação.
+- **Ícone e splash** ainda são os do template do Expo. Funciona, mas parece
+  inacabado na tela de quem instalou.
+- **Nenhuma fórmula com coeficiente calcula** (RN-06). Se o cliente for testar
+  uma avaliação completa, avise antes — senão ele vai reportar como defeito o
+  que é uma trava proposital.
+- **O app precisa alcançar o Supabase.** Da rede do cliente isso funciona; do
+  ambiente de nuvem onde parte do projeto foi escrito, não.
+
+> O plano gratuito do EAS tem fila e limite de builds por mês. Para algumas
+> versões por mês, sobra.
 
 ## 4. Nas lojas
 
@@ -81,8 +137,8 @@ Só quando o app estiver pronto para pacientes de verdade. Antes disso faltam
 três decisões suas, hoje provisórias em `apps/mobile/app.json`:
 
 - o nome que aparece na loja e embaixo do ícone (hoje `Nutri`)
-- o identificador do app (hoje `appnutricionista`), que **não muda depois de
-  publicado**
+- o identificador do app (hoje `com.appnutricionista.nutri`), que **não muda
+  depois de publicado**
 - ícone e splash próprios, no lugar dos do template
 
 E, do lado burocrático: conta Google Play (US$ 25, uma vez) e conta Apple
