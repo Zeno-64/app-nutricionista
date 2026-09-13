@@ -79,10 +79,14 @@ create type public.acao_auditoria as enum (
 -- sequestrada.
 -- ---------------------------------------------------------------------------
 
+-- Toda função deste projeto fixa o search_path. Sem isso, quem chama pode
+-- apontar o caminho para um schema próprio e fazer a função usar uma tabela ou
+-- um operador plantado no lugar do original.
 create or replace function app.usuario_atual()
 returns uuid
 language sql
 stable
+set search_path = public, pg_temp
 as $$
   select auth.uid();
 $$;
@@ -94,6 +98,7 @@ $$;
 create or replace function app.marcar_atualizacao()
 returns trigger
 language plpgsql
+set search_path = public, pg_temp
 as $$
 begin
   new.atualizado_em := now();
@@ -110,6 +115,7 @@ $$;
 create or replace function app.impedir_alteracao_finalizada()
 returns trigger
 language plpgsql
+set search_path = public, pg_temp
 as $$
 declare
   ignorados text[] := array['substituida_por_id', 'atualizado_em', 'liberada_em'];
@@ -139,6 +145,7 @@ $$;
 create or replace function app.impedir_alteracao()
 returns trigger
 language plpgsql
+set search_path = public, pg_temp
 as $$
 begin
   raise exception '% em %.% não é permitido: a tabela é somente de inserção.',

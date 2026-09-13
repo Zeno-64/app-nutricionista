@@ -74,20 +74,18 @@ três pacotes, painel e app empacotam, console do navegador sem erro.
    nuvem recusa os domínios das publicações (`www.fao.org`,
    `journals.plos.org` e os demais) — ver `docs/verificacao-formulas.md`.
    Precisa de máquina com acesso aberto, ou liberar esses domínios.
-2. **Sem Docker no ambiente,** o Supabase local não sobe. As migrations foram
-   aplicadas e testadas num Postgres comum, com o shim de
-   `supabase/testes/00_shim_supabase.sql`. Nada foi exercitado ainda contra um
-   projeto Supabase de verdade.
-3. **Sem credenciais de projeto Supabase,** nem o painel nem o app foram
-   testados ponta a ponta. Os dois sobem e dizem o que falta no `.env`.
+2. **Sem Docker no ambiente,** o Supabase local não sobe. As migrations rodam e
+   são testadas num Postgres comum, com o shim de
+   `supabase/testes/00_shim_supabase.sql` (`npm run db:teste`).
+3. **A rede da sessão em nuvem recusa `*.supabase.co`,** então o navegador
+   daqui não alcança o projeto. O painel e o app não puderam ser exercitados
+   ponta a ponta a partir deste ambiente — na máquina do Kevin funcionam com
+   `npm run web`. As telas foram conferidas rodando o painel de verdade e
+   interceptando as respostas HTTP com os mesmos dados do banco.
 
-   O projeto `Zeno-64's Project` (ref `igsbxhvoqqpuioajpfpi`, `sa-east-1`,
-   Postgres 17) foi inspecionado em 2026-09-13 e está **completamente vazio**:
-   nenhuma tabela em `public`, nenhum usuário, nenhum bucket, nenhuma migration.
-   Serve para desenvolvimento. Ele estava pausado e foi religado para essa
-   conferência, então **está ligado agora** — pausar de novo é no painel do
-   Supabase. As migrations não chegaram a ser aplicadas: o acesso ao Supabase
-   caiu no meio da sessão.
+   **O esquema está aplicado no projeto de desenvolvimento** desde 2026-09-13,
+   com dados de demonstração e contas de teste — ver `supabase/README.md`.
+   As chaves estão no `.env` da raiz, fora do repositório.
 
 Pendências com o Kevin:
 - Prints do questionário de pré-consulta atual.
@@ -104,11 +102,9 @@ Pendências com o Kevin:
    coeficientes em `docs/verificacao-formulas.md`, implementar o `calcular`,
    escrever o teste com o valor de referência e só então virar o status. Siri
    vem primeiro: sem ela, nenhum protocolo de densidade calcula.
-2. **Projeto Supabase de desenvolvimento:** aplicar as 12 migrations no projeto
-   vazio já existente (`supabase link` e `supabase db push`, ou pelo editor SQL
-   na ordem dos arquivos), pôr URL e chave anônima no `.env` e exercitar painel
-   e app ponta a ponta. Depois, criar o primeiro tenant, o membro proprietário e
-   o modelo padrão com `criar_modelo_padrao_anamnese`.
+2. **Exercitar painel e app ponta a ponta** contra o projeto de
+   desenvolvimento, numa máquina cuja rede alcance o Supabase. O esquema, os
+   dados de demonstração e as contas de teste já estão lá.
 3. **Painel:** convite do paciente para o app, criação e edição de modelos de
    formulário, anexos e fotos de evolução, PDF da avaliação.
 4. **App:** ficha e linha do tempo do paciente, preencher anamnese e avaliação

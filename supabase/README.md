@@ -2,6 +2,41 @@
 
 Postgres do Supabase, multi-tenant, com isolamento por RLS.
 
+## Projeto de desenvolvimento
+
+`Zeno-64's Project` — ref `igsbxhvoqqpuioajpfpi`, região `sa-east-1` (São Paulo,
+RNF-04), Postgres 17. O esquema todo está aplicado lá desde 2026-09-13, com
+dados de demonstração.
+
+URL e chave anônima ficam no `.env` da raiz, que está no `.gitignore`. Para
+ligar o painel:
+
+```sh
+npm run web        # http://127.0.0.1:5173
+```
+
+Contas de demonstração (fictícias, só neste projeto de desenvolvimento):
+
+| Conta | E-mail | Senha |
+|---|---|---|
+| Nutricionista | `nutri@demo.test` | `demonstracao123` |
+| Paciente | `paciente@demo.test` | `demonstracao123` |
+
+Os dados de demonstração são a nutricionista Ana Ribeiro, duas pacientes (uma
+delas marcada como importada da Nutrio), uma anamnese finalizada com o
+questionário da §4.4, uma pré-consulta aguardando resposta e três avaliações ao
+longo de seis meses, liberadas para o paciente.
+
+Para limpar tudo:
+
+```sql
+delete from public.tenants where id = '11111111-1111-4111-8111-000000000001';
+delete from auth.users where email like '%@demo.test';
+```
+
+> O projeto estava pausado e foi religado em 2026-09-13 para receber o esquema.
+> Pausar de novo é no painel do Supabase.
+
 ## Como rodar
 
 O Supabase local precisa de Docker:
@@ -67,6 +102,28 @@ Não dependem de a aplicação lembrar de aplicá-las:
   GET, e exige o fator na que resulta em TMB.
 - **RNF-11** — gatilho grava criação, alteração e exclusão na auditoria; a
   visualização entra por `registrar_visualizacao`.
+
+## Segurança conferida
+
+O linter do Supabase rodou depois de aplicar o esquema e apontou duas coisas
+reais, já corrigidas na migration de permissões e na de endurecimento:
+
+- **`search_path` solto em 9 funções.** Sem `search_path` fixo, quem chama pode
+  apontar o caminho para um schema próprio e fazer a função usar uma tabela ou
+  um operador plantado no lugar do original. Agora toda função fixa o caminho.
+- **`EXECUTE` concedido a `PUBLIC`.** O Postgres concede por padrão em toda
+  função nova e o PostgREST expõe o schema `public` como RPC, então
+  `/rest/v1/rpc/finalizar_pre_consulta` e `/rest/v1/rpc/registrar_visualizacao`
+  estavam alcançáveis sem login. As duas checam permissão por dentro, mas não
+  havia motivo para deixá-las expostas. O `revoke` agora cobre funções e
+  rotinas, não só tabelas.
+
+Sobra um aviso que é ajuste de painel, não de código: **proteção contra senha
+vazada está desligada**. Vale ligar em Authentication → Policies.
+
+`public.rls_auto_enable` também aparece no linter: é um gatilho de evento que o
+próprio Supabase instala para ligar RLS em tabela nova. Não é do projeto e já
+tem `search_path` fixo.
 
 ## O que ainda falta
 

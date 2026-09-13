@@ -10,6 +10,7 @@
 create or replace function public.criar_modelo_padrao_anamnese(p_tenant uuid)
 returns uuid
 language plpgsql
+set search_path = public, pg_temp
 as $$
 declare
   v_modelo_id uuid;

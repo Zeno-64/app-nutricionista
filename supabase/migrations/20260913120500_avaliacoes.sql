@@ -127,9 +127,12 @@ create trigger avaliacoes_imutavel
 -- Nova versão (RN-02)
 -- ---------------------------------------------------------------------------
 
+-- SECURITY INVOKER de propósito: a RLS precisa valer para quem chamou, senão a
+-- função viraria um atalho para versionar avaliação de outro consultório.
 create or replace function public.nova_versao_avaliacao(p_avaliacao uuid)
 returns uuid
 language plpgsql
+set search_path = public, pg_temp
 as $$
 declare
   v_antiga public.avaliacoes;

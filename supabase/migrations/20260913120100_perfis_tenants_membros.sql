@@ -30,6 +30,7 @@ create trigger perfis_atualizacao
 create or replace function app.impedir_troca_de_perfil()
 returns trigger
 language plpgsql
+set search_path = public, pg_temp
 as $$
 begin
   if new.tipo is distinct from old.tipo and current_user <> 'service_role' then
@@ -131,6 +132,7 @@ create or replace function app.e_proprietario(p_tenant uuid)
 returns boolean
 language sql
 stable
+set search_path = public, pg_temp
 as $$
   select app.papel_no_tenant(p_tenant) = 'proprietario';
 $$;

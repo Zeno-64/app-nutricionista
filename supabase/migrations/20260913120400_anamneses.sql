@@ -140,9 +140,12 @@ create trigger respostas_anamnese_imutavel
 -- Nova versão (RF-25 / RN-02)
 -- ---------------------------------------------------------------------------
 
+-- SECURITY INVOKER de propósito: a RLS precisa valer para quem chamou, senão a
+-- função viraria um atalho para versionar anamnese de outro consultório.
 create or replace function public.nova_versao_anamnese(p_anamnese uuid)
 returns uuid
 language plpgsql
+set search_path = public, pg_temp
 as $$
 declare
   v_antiga public.anamneses;

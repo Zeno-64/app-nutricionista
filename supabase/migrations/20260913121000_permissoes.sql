@@ -14,6 +14,14 @@
 revoke all on all tables in schema public from anon, authenticated;
 revoke all on all sequences in schema public from anon, authenticated;
 
+-- O Postgres concede EXECUTE a PUBLIC em toda função nova, e o PostgREST expõe
+-- o schema public como RPC. Sem revogar isso, qualquer um sem login alcançaria
+-- /rest/v1/rpc/... — inclusive as funções SECURITY DEFINER. Elas checam
+-- permissão por dentro, mas não há motivo para deixá-las expostas.
+revoke all on all functions in schema public from public, anon, authenticated;
+revoke all on all routines in schema public from public, anon, authenticated;
+revoke all on all functions in schema app from public, anon, authenticated;
+
 grant usage on schema app to authenticated;
 
 -- As funções auxiliares são chamadas dentro das próprias políticas de RLS e,
