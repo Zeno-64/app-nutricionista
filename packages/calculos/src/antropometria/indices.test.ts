@@ -1,5 +1,5 @@
-import { arredondar } from '../numeros.js';
-import { calcularRce, calcularRcq } from './indices.js';
+import { arredondar } from '../numeros';
+import { calcularRce, calcularRcq } from './indices';
 
 describe('relação cintura-quadril', () => {
   it('divide cintura por quadril', () => {

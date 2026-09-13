@@ -16,6 +16,10 @@ que falta configurar, em vez de quebrar.
   `package.json` da raiz garante uma cópia só de React no workspace.
 - **react-router na linha 7.** A 8 exige `react >= 19.2.7`, o que brigaria com
   a versão fixada pelo Expo. A API que o painel usa é a mesma nas duas.
+- **Imports relativos sem extensão.** O Metro, do Expo, não resolve o `.js`
+  que o TypeScript aceita em import relativo, e o pacote de cálculos é
+  compartilhado com o app. Por isso o repositório inteiro usa `./x` e não
+  `./x.js`.
 - **O cálculo mora em `@nutri/calculos`,** não na tela. `calculoAoVivo.ts` é uma
   função pura que recebe o formulário como está digitado — texto, vírgula
   decimal, campos pela metade — e devolve o que dá para calcular agora, com um
@@ -37,6 +41,8 @@ que falta configurar, em vez de quebrar.
   não se aplicam, preenchimento, finalização, nova versão e comparação com a
   anterior (RF-20 a RF-26)
 - Nova avaliação com cálculo ao vivo e memória de cálculo (RF-30 a RF-45)
+- Evolução: gráfico por indicador e tabela comparativa entre avaliações
+  (RF-50, RF-51)
 - Área do paciente com as avaliações liberadas (RF-62)
 
 ## O que falta
@@ -46,6 +52,5 @@ que falta configurar, em vez de quebrar.
 - Criação e edição de modelos de formulário (RF-20, RF-27) — hoje só existe o
   modelo padrão criado pela função do banco
 - Anexos e fotos de evolução (RF-14, RF-15)
-- Gráficos de evolução e tabela comparativa (RF-50, RF-51)
 - PDF da avaliação (RF-52)
 - Migração da Nutrio (RF-80 a RF-87)

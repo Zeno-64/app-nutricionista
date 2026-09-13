@@ -1,8 +1,8 @@
 import { Navigate } from 'react-router';
 import type { ReactNode } from 'react';
-import { Carregando } from '../componentes/ui.js';
-import type { PerfilTipo } from '../dados/tipos.js';
-import { useSessao } from './Sessao.js';
+import { Carregando } from '../componentes/ui';
+import type { PerfilTipo } from '../dados/tipos';
+import { useSessao } from './Sessao';
 
 /**
  * RN-08 e RF-01: cada área é de um tipo de perfil. Quem entra na área errada é

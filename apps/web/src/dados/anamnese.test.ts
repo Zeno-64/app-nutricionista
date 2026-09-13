@@ -10,7 +10,7 @@ import {
   type PerguntaModelo,
   type RespostaAnamnese,
   type SecaoModelo,
-} from './anamnese.js';
+} from './anamnese';
 
 const SECOES: SecaoModelo[] = [
   { id: 's2', ordem: 2, titulo: 'Rotina' },

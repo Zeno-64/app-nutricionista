@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { mensagem } from '../autenticacao/Sessao.js';
-import { Aviso, Botao, Campo, Carregando, Cartao, Etiqueta } from '../componentes/ui.js';
-import { listarPacientes } from '../dados/consultas.js';
-import { formatarData } from '../dados/linhaDoTempo.js';
-import type { Paciente } from '../dados/tipos.js';
+import { mensagem } from '../autenticacao/Sessao';
+import { Aviso, Botao, Campo, Carregando, Cartao, Etiqueta } from '../componentes/ui';
+import { listarPacientes } from '../dados/consultas';
+import { formatarData } from '../dados/linhaDoTempo';
+import type { Paciente } from '../dados/tipos';
 
 /** RF-11: listar, buscar e filtrar pacientes. */
 export function Pacientes() {

@@ -71,6 +71,25 @@ export interface Avaliacao {
   liberada_em: string | null;
   peso: number | null;
   altura: number | null;
+
+  circ_pescoco: number | null;
+  circ_braco: number | null;
+  circ_cintura: number | null;
+  circ_abdomen: number | null;
+  circ_quadril: number | null;
+  circ_coxa: number | null;
+  circ_panturrilha: number | null;
+
+  dobra_peitoral: number | null;
+  dobra_axilar_media: number | null;
+  dobra_triceps: number | null;
+  dobra_biceps: number | null;
+  dobra_subescapular: number | null;
+  dobra_abdominal: number | null;
+  dobra_supra_iliaca: number | null;
+  dobra_coxa: number | null;
+  dobra_panturrilha_medial: number | null;
+
   imc: number | null;
   imc_classificacao: string | null;
   rcq: number | null;

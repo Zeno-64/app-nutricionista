@@ -1,5 +1,5 @@
-import { formatar } from '../numeros.js';
-import type { MemoriaCalculo, StatusVerificacao } from '../tipos.js';
+import { formatar } from '../numeros';
+import type { MemoriaCalculo, StatusVerificacao } from '../tipos';
 
 /**
  * Conversão de densidade corporal em percentual de gordura (RF-34).

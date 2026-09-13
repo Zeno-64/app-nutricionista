@@ -1,6 +1,6 @@
 import { Link, Outlet } from 'react-router';
-import { useSessao } from '../autenticacao/Sessao.js';
-import { Botao } from './ui.js';
+import { useSessao } from '../autenticacao/Sessao';
+import { Botao } from './ui';
 
 export function Layout() {
   const { perfil, sair } = useSessao();

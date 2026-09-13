@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { mensagem, useSessao } from '../autenticacao/Sessao.js';
-import { Aviso, Carregando, Cartao, Etiqueta } from '../componentes/ui.js';
-import { exigirSupabase } from '../dados/supabase.js';
-import { formatarData, formatarNumero } from '../dados/linhaDoTempo.js';
-import type { Avaliacao } from '../dados/tipos.js';
+import { mensagem, useSessao } from '../autenticacao/Sessao';
+import { Aviso, Carregando, Cartao, Etiqueta } from '../componentes/ui';
+import { exigirSupabase } from '../dados/supabase';
+import { formatarData, formatarNumero } from '../dados/linhaDoTempo';
+import type { Avaliacao } from '../dados/tipos';
 
 /**
  * RF-62: o paciente vê as avaliações que o nutricionista liberou. A RLS já

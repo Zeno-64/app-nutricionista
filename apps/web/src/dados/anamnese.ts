@@ -1,4 +1,4 @@
-import type { GrupoPaciente, Paciente, TipoPergunta } from './tipos.js';
+import type { GrupoPaciente, Paciente, TipoPergunta } from './tipos';
 import type { Sexo } from '@nutri/calculos';
 
 /**

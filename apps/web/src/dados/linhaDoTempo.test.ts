@@ -1,5 +1,5 @@
-import { montarLinhaDoTempo } from './linhaDoTempo.js';
-import type { Anamnese, Avaliacao } from './tipos.js';
+import { montarLinhaDoTempo } from './linhaDoTempo';
+import type { Anamnese, Avaliacao } from './tipos';
 
 function avaliacao(ajustes: Partial<Avaliacao>): Avaliacao {
   return {
@@ -13,6 +13,22 @@ function avaliacao(ajustes: Partial<Avaliacao>): Avaliacao {
     liberada_em: null,
     peso: 68.4,
     altura: 165,
+    circ_pescoco: null,
+    circ_braco: null,
+    circ_cintura: null,
+    circ_abdomen: null,
+    circ_quadril: null,
+    circ_coxa: null,
+    circ_panturrilha: null,
+    dobra_peitoral: null,
+    dobra_axilar_media: null,
+    dobra_triceps: null,
+    dobra_biceps: null,
+    dobra_subescapular: null,
+    dobra_abdominal: null,
+    dobra_supra_iliaca: null,
+    dobra_coxa: null,
+    dobra_panturrilha_medial: null,
     imc: 25.12,
     imc_classificacao: 'Sobrepeso',
     rcq: null,

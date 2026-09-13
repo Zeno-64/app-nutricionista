@@ -18,18 +18,18 @@ import {
 } from '@nutri/calculos';
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { mensagem, useSessao } from '../../autenticacao/Sessao.js';
-import { MemoriaDeCalculo } from '../../componentes/MemoriaDeCalculo.js';
-import { Aviso, Botao, Campo, Cartao, Etiqueta, Selecao } from '../../componentes/ui.js';
-import { salvarAvaliacao } from '../../dados/avaliacoes.js';
-import { formatarNumero } from '../../dados/linhaDoTempo.js';
+import { mensagem, useSessao } from '../../autenticacao/Sessao';
+import { MemoriaDeCalculo } from '../../componentes/MemoriaDeCalculo';
+import { Aviso, Botao, Campo, Cartao, Etiqueta, Selecao } from '../../componentes/ui';
+import { salvarAvaliacao } from '../../dados/avaliacoes';
+import { formatarNumero } from '../../dados/linhaDoTempo';
 import {
   FORMULARIO_VAZIO,
   calcularAoVivo,
   medidasExigidas,
   type Bloco,
   type FormularioAvaliacao,
-} from './calculoAoVivo.js';
+} from './calculoAoVivo';
 
 const CIRCUNFERENCIAS = Object.keys(ROTULOS_CIRCUNFERENCIA) as Circunferencia[];
 const DOBRAS = Object.keys(ROTULOS_DOBRA) as DobraCutanea[];

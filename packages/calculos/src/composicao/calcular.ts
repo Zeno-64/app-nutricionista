@@ -1,11 +1,11 @@
-import { FormulaIndisponivelError } from '../erros.js';
-import type { DadosAvaliacao, MemoriaCalculo } from '../tipos.js';
-import { podeCalcular } from '../tipos.js';
-import { validarDados } from '../validacao.js';
-import { derivarMassas } from './massas.js';
-import type { ProtocoloId } from './protocolos.js';
-import { PROTOCOLOS_COMPOSICAO, obterProtocolo } from './protocolos.js';
-import { SIRI, converterSiri } from './siri.js';
+import { FormulaIndisponivelError } from '../erros';
+import type { DadosAvaliacao, MemoriaCalculo } from '../tipos';
+import { podeCalcular } from '../tipos';
+import { validarDados } from '../validacao';
+import { derivarMassas } from './massas';
+import type { ProtocoloId } from './protocolos';
+import { PROTOCOLOS_COMPOSICAO, obterProtocolo } from './protocolos';
+import { SIRI, converterSiri } from './siri';
 
 export interface ResultadoComposicaoCorporal {
   protocolo: ProtocoloId;

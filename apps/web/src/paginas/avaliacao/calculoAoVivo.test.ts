@@ -3,8 +3,8 @@ import {
   calcularAoVivo,
   medidasExigidas,
   paraNumero,
-} from './calculoAoVivo.js';
-import type { FormularioAvaliacao } from './calculoAoVivo.js';
+} from './calculoAoVivo';
+import type { FormularioAvaliacao } from './calculoAoVivo';
 
 function formulario(ajustes: Partial<FormularioAvaliacao>): FormularioAvaliacao {
   return { ...FORMULARIO_VAZIO, ...ajustes };

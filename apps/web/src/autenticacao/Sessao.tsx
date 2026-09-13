@@ -1,9 +1,9 @@
 import type { User } from '@supabase/supabase-js';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { carregarMembro, carregarPerfil } from '../dados/consultas.js';
-import { supabase, supabaseConfigurado } from '../dados/supabase.js';
-import type { Membro, Perfil } from '../dados/tipos.js';
+import { carregarMembro, carregarPerfil } from '../dados/consultas';
+import { supabase, supabaseConfigurado } from '../dados/supabase';
+import type { Membro, Perfil } from '../dados/tipos';
 
 interface EstadoSessao {
   usuario: User | null;

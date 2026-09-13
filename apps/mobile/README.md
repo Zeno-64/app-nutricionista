@@ -18,7 +18,7 @@ falta na tela de login, em vez de quebrar.
 | `/` | Redireciona conforme o perfil da conta |
 | `/entrar` | Qualquer um sem sessão |
 | `/pacientes` | Nutricionista |
-| `/evolucao` | Paciente |
+| `/evolucao` | Paciente — avaliações liberadas e gráfico de evolução |
 
 As duas áreas ficam em grupos (`(nutricionista)` e `(paciente)`), cada um com um
 layout que confere o perfil e manda embora quem entrou na área errada.
@@ -30,6 +30,12 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 - **A tela do paciente não filtra por liberação.** A RLS já devolve só a
   avaliação liberada (RN-03); filtrar de novo na tela daria a impressão errada
   de que a regra mora no aplicativo.
+- **O gráfico compartilha a geometria com o painel.** `@nutri/calculos`
+  devolve as coordenadas e o `path` do SVG; o `react-native-svg` daqui e o
+  `<svg>` do navegador desenham exatamente a mesma linha.
+- **Imports relativos sem extensão:** o Metro não resolve o `.js` que o
+  TypeScript aceita, e isso quebrava o bundle assim que o app passou a
+  importar o pacote de cálculos.
 - **O `expo-env.d.ts` é gerado pelo script de typecheck** quando não existe. O
   Expo só o cria no primeiro `expo start`, e sem ele o `tsc` quebra em clone
   novo.
@@ -40,7 +46,6 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 - Preencher anamnese e avaliação pelo celular (RF-56)
 - Enviar pré-consulta e liberar avaliação (RF-57)
 - Responder pré-consulta, do lado do paciente (RF-61)
-- Gráficos de evolução (RF-58)
 - Notificação push (RF-63) e login por biometria (RF-06)
 - Rascunho local enquanto não sincroniza (RNF-07)
 - Nome do app e identificador nas lojas: ainda pendente com o Kevin. O `app.json`

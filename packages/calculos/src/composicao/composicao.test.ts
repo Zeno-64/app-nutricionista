@@ -1,11 +1,11 @@
-import { FormulaIndisponivelError, MedidaFaltandoError } from '../erros.js';
-import { arredondar } from '../numeros.js';
-import type { DadosAvaliacao } from '../tipos.js';
-import { validarDados } from '../validacao.js';
-import { calcularComposicao, protocolosAtendidos } from './calcular.js';
-import { derivarMassas, percentualPelaMassaLivre } from './massas.js';
-import { PROTOCOLOS_COMPOSICAO, coeficientesDurnin, obterProtocolo } from './protocolos.js';
-import { converterSiri } from './siri.js';
+import { FormulaIndisponivelError, MedidaFaltandoError } from '../erros';
+import { arredondar } from '../numeros';
+import type { DadosAvaliacao } from '../tipos';
+import { validarDados } from '../validacao';
+import { calcularComposicao, protocolosAtendidos } from './calcular';
+import { derivarMassas, percentualPelaMassaLivre } from './massas';
+import { PROTOCOLOS_COMPOSICAO, coeficientesDurnin, obterProtocolo } from './protocolos';
+import { converterSiri } from './siri';
 
 const HOMEM: DadosAvaliacao = {
   sexo: 'masculino',

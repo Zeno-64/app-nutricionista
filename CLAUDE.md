@@ -36,6 +36,9 @@ implementar. Status das fórmulas em
   status `pendente` e não calcula.
 - Fórmulas EER já resultam em GET: nunca multiplicar por fator de atividade.
 - Interface, documentação e mensagens de commit em português do Brasil.
+- Import relativo sem extensão (`./x`, nunca `./x.js`): o Metro, do Expo, não
+  resolve o `.js` que o TypeScript aceita, e o pacote de cálculos é
+  compartilhado entre app e painel.
 - Segredos (chaves do Supabase etc.) só em `.env`, nunca no repositório.
 
 ## Estado atual (2026-09-13)
@@ -54,12 +57,13 @@ Requisitos v0.2 fechados. Monorepo de pé, com as quatro partes andando:
   `supabase/README.md`.
 - **`apps/web`** — login, rota por perfil, lista de pacientes, cadastro e edição
   com validação, arquivamento, linha do tempo, anamnese e pré-consulta com
-  versionamento e comparação, e nova avaliação com cálculo ao vivo e memória na
-  tela.
-- **`apps/mobile`** — login, rota por perfil, lista de pacientes e avaliações
-  liberadas.
+  versionamento e comparação, nova avaliação com cálculo ao vivo e memória na
+  tela, e evolução com gráfico e tabela comparativa.
+- **`apps/mobile`** — login, rota por perfil, lista de pacientes e, para o
+  paciente, as avaliações liberadas com gráfico de evolução. O gráfico usa a
+  mesma geometria do painel, calculada em `@nutri/calculos`.
 
-185 testes no workspace, mais 32 asserções de RLS no banco. Typecheck limpo nos
+206 testes no workspace, mais 32 asserções de RLS no banco. Typecheck limpo nos
 três pacotes, painel e app empacotam, console do navegador sem erro.
 
 ### Três bloqueios que dependem de fora
@@ -106,7 +110,7 @@ Pendências com o Kevin:
    e app ponta a ponta. Depois, criar o primeiro tenant, o membro proprietário e
    o modelo padrão com `criar_modelo_padrao_anamnese`.
 3. **Painel:** convite do paciente para o app, criação e edição de modelos de
-   formulário, anexos, gráficos de evolução e tabela comparativa.
+   formulário, anexos e fotos de evolução, PDF da avaliação.
 4. **App:** ficha e linha do tempo do paciente, preencher anamnese e avaliação
    pelo celular, enviar pré-consulta e liberar avaliação, responder
    pré-consulta.

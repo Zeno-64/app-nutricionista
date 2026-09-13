@@ -1,6 +1,6 @@
-import { formatar } from '../numeros.js';
-import type { MemoriaCalculo, Sexo } from '../tipos.js';
-import { obrigatorio } from '../validacao.js';
+import { formatar } from '../numeros';
+import type { MemoriaCalculo, Sexo } from '../tipos';
+import { obrigatorio } from '../validacao';
 
 /**
  * Relação cintura-quadril (RCQ) e relação cintura-estatura (RCE) — RF-31.

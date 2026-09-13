@@ -1,5 +1,5 @@
 import { arredondar, type MemoriaCalculo } from '@nutri/calculos';
-import { formatarNumero } from '../dados/linhaDoTempo.js';
+import { formatarNumero } from '../dados/linhaDoTempo';
 
 /**
  * RF-38: mostra a memória de cálculo — fórmula, fonte, medidas que entraram e

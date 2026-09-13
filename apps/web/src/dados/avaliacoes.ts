@@ -1,7 +1,7 @@
 import { obterFormulaEnergia } from '@nutri/calculos';
-import type { FormularioAvaliacao, ResultadoAoVivo } from '../paginas/avaliacao/calculoAoVivo.js';
-import { paraNumero } from '../paginas/avaliacao/calculoAoVivo.js';
-import { exigirSupabase } from './supabase.js';
+import type { FormularioAvaliacao, ResultadoAoVivo } from '../paginas/avaliacao/calculoAoVivo';
+import { paraNumero } from '../paginas/avaliacao/calculoAoVivo';
+import { exigirSupabase } from './supabase';
 
 /**
  * Grava a avaliação com o cálculo já feito (RF-45) e a memória como foi

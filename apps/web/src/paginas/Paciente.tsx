@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { mensagem } from '../autenticacao/Sessao.js';
-import { Aviso, Botao, Carregando, Cartao, Etiqueta } from '../componentes/ui.js';
-import { carregarPaciente, listarAnamneses, listarAvaliacoes } from '../dados/consultas.js';
-import { formatarData, montarLinhaDoTempo } from '../dados/linhaDoTempo.js';
-import type { ItemLinhaDoTempo, Paciente as PacienteDTO } from '../dados/tipos.js';
+import { mensagem } from '../autenticacao/Sessao';
+import { Aviso, Botao, Carregando, Cartao, Etiqueta } from '../componentes/ui';
+import { carregarPaciente, listarAnamneses, listarAvaliacoes } from '../dados/consultas';
+import { formatarData, montarLinhaDoTempo } from '../dados/linhaDoTempo';
+import type { ItemLinhaDoTempo, Paciente as PacienteDTO } from '../dados/tipos';
 
 /** RF-13: linha do tempo do paciente, em ordem cronológica. */
 export function Paciente() {
@@ -57,6 +57,9 @@ export function Paciente() {
         <div className="flex flex-wrap gap-2">
           <Link to={`/pacientes/${paciente.id}/editar`}>
             <Botao variante="secundario">Editar cadastro</Botao>
+          </Link>
+          <Link to={`/pacientes/${paciente.id}/evolucao`}>
+            <Botao variante="secundario">Evolução</Botao>
           </Link>
           <Link to={`/pacientes/${paciente.id}/anamneses/nova?tipo=pre_consulta`}>
             <Botao variante="secundario">Enviar pré-consulta</Botao>

@@ -1,8 +1,8 @@
-import { formatar } from '../numeros.js';
-import type { DadosAvaliacao, GrupoPaciente, MemoriaCalculo, StatusVerificacao } from '../tipos.js';
-import type { Exigencias } from '../validacao.js';
-import { obrigatorio } from '../validacao.js';
-import type { NivelAtividade } from './fatores-atividade.js';
+import { formatar } from '../numeros';
+import type { DadosAvaliacao, GrupoPaciente, MemoriaCalculo, StatusVerificacao } from '../tipos';
+import type { Exigencias } from '../validacao';
+import { obrigatorio } from '../validacao';
+import type { NivelAtividade } from './fatores-atividade';
 
 /**
  * Catálogo de fórmulas de gasto energético (§4.6 dos requisitos).

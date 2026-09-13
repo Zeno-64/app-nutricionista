@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { mensagem, useSessao } from '../../autenticacao/Sessao.js';
+import { mensagem, useSessao } from '../../autenticacao/Sessao';
 import {
   AreaTexto,
   Aviso,
@@ -10,14 +10,14 @@ import {
   Cartao,
   Etiqueta,
   Selecao,
-} from '../../componentes/ui.js';
+} from '../../componentes/ui';
 import {
   agruparPorSecao,
   compararVersoes,
   valorEmTexto,
   type ComparacaoResposta,
   type RespostaAnamnese,
-} from '../../dados/anamnese.js';
+} from '../../dados/anamnese';
 import {
   carregarAnamnese,
   carregarAnamneseAnterior,
@@ -25,9 +25,9 @@ import {
   finalizarAnamnese,
   novaVersaoAnamnese,
   salvarResposta,
-} from '../../dados/consultas.js';
-import { formatarData } from '../../dados/linhaDoTempo.js';
-import type { Anamnese as AnamneseDTO } from '../../dados/tipos.js';
+} from '../../dados/consultas';
+import { formatarData } from '../../dados/linhaDoTempo';
+import type { Anamnese as AnamneseDTO } from '../../dados/tipos';
 
 /**
  * Preenchimento e leitura de anamnese e pré-consulta (RF-24 a RF-26).

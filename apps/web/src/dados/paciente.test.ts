@@ -8,7 +8,7 @@ import {
   temErro,
   validarPaciente,
   type FormularioPaciente,
-} from './paciente.js';
+} from './paciente';
 
 const HOJE = new Date('2026-09-13T12:00:00');
 

@@ -1,4 +1,4 @@
-import type { StatusVerificacao } from '../tipos.js';
+import type { StatusVerificacao } from '../tipos';
 
 /**
  * Fator de atividade usado para transformar TMB em GET (RF-41).

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import type { Sexo } from '@nutri/calculos';
-import { mensagem, useSessao } from '../autenticacao/Sessao.js';
+import { mensagem, useSessao } from '../autenticacao/Sessao';
 import {
   AreaTexto,
   Aviso,
@@ -12,13 +12,13 @@ import {
   Cartao,
   Erro,
   Selecao,
-} from '../componentes/ui.js';
+} from '../componentes/ui';
 import {
   atualizarPaciente,
   carregarPaciente,
   criarPaciente,
   definirArquivamento,
-} from '../dados/consultas.js';
+} from '../dados/consultas';
 import {
   FORMULARIO_PACIENTE_VAZIO,
   ROTULOS_GRUPO,
@@ -29,8 +29,8 @@ import {
   validarPaciente,
   type ErrosPaciente,
   type FormularioPaciente,
-} from '../dados/paciente.js';
-import type { GrupoPaciente, Paciente } from '../dados/tipos.js';
+} from '../dados/paciente';
+import type { GrupoPaciente, Paciente } from '../dados/tipos';
 
 const GRUPOS = Object.keys(ROTULOS_GRUPO) as GrupoPaciente[];
 

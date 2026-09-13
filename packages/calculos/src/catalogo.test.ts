@@ -1,9 +1,9 @@
-import { calcularComposicao } from './composicao/calcular.js';
-import { PROTOCOLOS_COMPOSICAO } from './composicao/protocolos.js';
-import { SIRI } from './composicao/siri.js';
-import { calcularGastoEnergetico } from './energia/calcular.js';
-import { FORMULAS_ENERGIA } from './energia/formulas.js';
-import { podeCalcular } from './tipos.js';
+import { calcularComposicao } from './composicao/calcular';
+import { PROTOCOLOS_COMPOSICAO } from './composicao/protocolos';
+import { SIRI } from './composicao/siri';
+import { calcularGastoEnergetico } from './energia/calcular';
+import { FORMULAS_ENERGIA } from './energia/formulas';
+import { podeCalcular } from './tipos';
 
 /**
  * Regra que não pode ser quebrada (CLAUDE.md, RN-06): enquanto uma fórmula não

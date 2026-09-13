@@ -1,11 +1,11 @@
-import { exigirSupabase } from './supabase.js';
+import { exigirSupabase } from './supabase';
 import type {
   PerguntaModelo,
   RespostaAnamnese,
   RespostaParaCriar,
   SecaoModelo,
-} from './anamnese.js';
-import type { Anamnese, Avaliacao, Membro, Paciente, Perfil, TipoFormulario } from './tipos.js';
+} from './anamnese';
+import type { Anamnese, Avaliacao, Membro, Paciente, Perfil, TipoFormulario } from './tipos';
 
 /** Consultas do painel. A RLS já limita as linhas ao tenant do usuário. */
 

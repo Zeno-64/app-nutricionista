@@ -1,13 +1,13 @@
-import { FatorAtividadeNaoAplicavelError, FormulaIndisponivelError, MedidaFaltandoError } from '../erros.js';
-import { arredondar } from '../numeros.js';
+import { FatorAtividadeNaoAplicavelError, FormulaIndisponivelError, MedidaFaltandoError } from '../erros';
+import { arredondar } from '../numeros';
 import {
   agruparPorPublico,
   buscarFormulas,
   calcularGastoEnergetico,
   formulasDisponiveis,
   formulasSugeridas,
-} from './calcular.js';
-import { FORMULAS_ENERGIA, obterFormulaEnergia } from './formulas.js';
+} from './calcular';
+import { FORMULAS_ENERGIA, obterFormulaEnergia } from './formulas';
 
 describe('catálogo de fórmulas (§4.6)', () => {
   it('traz as 24 fórmulas da lista de requisitos', () => {

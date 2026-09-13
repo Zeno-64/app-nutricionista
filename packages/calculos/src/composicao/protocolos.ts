@@ -1,7 +1,7 @@
-import { formatar, somar } from '../numeros.js';
-import type { DadosAvaliacao, MemoriaCalculo, Sexo, StatusVerificacao } from '../tipos.js';
-import type { Exigencias } from '../validacao.js';
-import { obrigatorio } from '../validacao.js';
+import { formatar, somar } from '../numeros';
+import type { DadosAvaliacao, MemoriaCalculo, Sexo, StatusVerificacao } from '../tipos';
+import type { Exigencias } from '../validacao';
+import { obrigatorio } from '../validacao';
 
 /**
  * Catálogo de protocolos de percentual de gordura (§4.5 dos requisitos).

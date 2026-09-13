@@ -1,4 +1,4 @@
-import type { Anamnese, Anexo, Avaliacao, ItemLinhaDoTempo } from './tipos.js';
+import type { Anamnese, Anexo, Avaliacao, ItemLinhaDoTempo } from './tipos';
 
 /**
  * Monta a linha do tempo do paciente (RF-13): consultas, anamneses, avaliações

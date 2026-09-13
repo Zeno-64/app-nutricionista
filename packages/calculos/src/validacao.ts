@@ -1,6 +1,6 @@
-import { MedidaFaltandoError, MedidaInvalidaError } from './erros.js';
-import { ROTULOS_CIRCUNFERENCIA, ROTULOS_DOBRA } from './rotulos.js';
-import type { Circunferencia, DadosAvaliacao, DobraCutanea } from './tipos.js';
+import { MedidaFaltandoError, MedidaInvalidaError } from './erros';
+import { ROTULOS_CIRCUNFERENCIA, ROTULOS_DOBRA } from './rotulos';
+import type { Circunferencia, DadosAvaliacao, DobraCutanea } from './tipos';
 
 /** Medidas que uma fórmula ou protocolo exige para um dado sexo (RF-33). */
 export interface Exigencias {

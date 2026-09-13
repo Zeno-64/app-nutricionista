@@ -1,7 +1,7 @@
-import { ErroCalculo } from '../erros.js';
-import { formatar } from '../numeros.js';
-import type { MemoriaCalculo } from '../tipos.js';
-import { obrigatorio } from '../validacao.js';
+import { ErroCalculo } from '../erros';
+import { formatar } from '../numeros';
+import type { MemoriaCalculo } from '../tipos';
+import { obrigatorio } from '../validacao';
 
 /**
  * Meta calórica e distribuição de macronutrientes (RF-44).

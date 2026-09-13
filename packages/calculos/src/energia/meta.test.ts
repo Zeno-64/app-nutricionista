@@ -1,6 +1,6 @@
-import { ErroCalculo } from '../erros.js';
-import { arredondar } from '../numeros.js';
-import { calcularMacros, calcularMetaCalorica } from './meta.js';
+import { ErroCalculo } from '../erros';
+import { arredondar } from '../numeros';
+import { calcularMacros, calcularMetaCalorica } from './meta';
 
 describe('meta calórica (RF-44)', () => {
   it('aplica déficit em kcal', () => {

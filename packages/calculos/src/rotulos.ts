@@ -1,4 +1,4 @@
-import type { Circunferencia, DobraCutanea, Sexo, StatusVerificacao } from './tipos.js';
+import type { Circunferencia, DobraCutanea, Sexo, StatusVerificacao } from './tipos';
 
 export const ROTULOS_DOBRA: Readonly<Record<DobraCutanea, string>> = {
   peitoral: 'Peitoral',

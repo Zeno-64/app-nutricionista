@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
-import { mensagem, useSessao } from '../../autenticacao/Sessao.js';
-import { Aviso, Botao, CaixaDeSelecao, Carregando, Cartao, Selecao } from '../../componentes/ui.js';
-import { contextoDoPaciente, montarRespostas } from '../../dados/anamnese.js';
+import { mensagem, useSessao } from '../../autenticacao/Sessao';
+import { Aviso, Botao, CaixaDeSelecao, Carregando, Cartao, Selecao } from '../../componentes/ui';
+import { contextoDoPaciente, montarRespostas } from '../../dados/anamnese';
 import {
   carregarModelo,
   carregarPaciente,
   criarAnamnese,
   listarModelos,
   type ModeloResumo,
-} from '../../dados/consultas.js';
-import type { Paciente, TipoFormulario } from '../../dados/tipos.js';
+} from '../../dados/consultas';
+import type { Paciente, TipoFormulario } from '../../dados/tipos';
 
 /**
  * RF-20 e RF-23: escolhe o modelo e cria a anamnese ou a pré-consulta já com as

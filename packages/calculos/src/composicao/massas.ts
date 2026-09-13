@@ -1,6 +1,6 @@
-import { formatar } from '../numeros.js';
-import type { MemoriaCalculo } from '../tipos.js';
-import { obrigatorio } from '../validacao.js';
+import { formatar } from '../numeros';
+import type { MemoriaCalculo } from '../tipos';
+import { obrigatorio } from '../validacao';
 
 /**
  * Massa gorda e massa livre de gordura a partir do percentual de gordura

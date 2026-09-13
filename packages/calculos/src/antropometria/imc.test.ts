@@ -1,6 +1,6 @@
-import { MedidaInvalidaError } from '../erros.js';
-import { arredondar } from '../numeros.js';
-import { FAIXAS_IMC_OMS, calcularImc, classificarImc } from './imc.js';
+import { MedidaInvalidaError } from '../erros';
+import { arredondar } from '../numeros';
+import { FAIXAS_IMC_OMS, calcularImc, classificarImc } from './imc';
 
 describe('IMC', () => {
   it('calcula peso ÷ altura² com a altura em centímetros', () => {

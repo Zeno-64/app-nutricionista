@@ -1,10 +1,10 @@
-import { FatorAtividadeNaoAplicavelError, FormulaIndisponivelError, MedidaFaltandoError } from '../erros.js';
-import { formatar } from '../numeros.js';
-import type { GrupoPaciente, MemoriaCalculo } from '../tipos.js';
-import { podeCalcular } from '../tipos.js';
-import { validarDados } from '../validacao.js';
-import type { DadosEnergia, FormulaEnergia, FormulaEnergiaId, PublicoFormula } from './formulas.js';
-import { FORMULAS_ENERGIA, obterFormulaEnergia } from './formulas.js';
+import { FatorAtividadeNaoAplicavelError, FormulaIndisponivelError, MedidaFaltandoError } from '../erros';
+import { formatar } from '../numeros';
+import type { GrupoPaciente, MemoriaCalculo } from '../tipos';
+import { podeCalcular } from '../tipos';
+import { validarDados } from '../validacao';
+import type { DadosEnergia, FormulaEnergia, FormulaEnergiaId, PublicoFormula } from './formulas';
+import { FORMULAS_ENERGIA, obterFormulaEnergia } from './formulas';
 
 export interface ResultadoGastoEnergetico {
   formula: FormulaEnergiaId;

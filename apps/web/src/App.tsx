@@ -1,16 +1,17 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
-import { ProvedorDeSessao, useSessao } from './autenticacao/Sessao.js';
-import { RotaProtegida } from './autenticacao/RotaProtegida.js';
-import { Layout } from './componentes/Layout.js';
-import { Carregando } from './componentes/ui.js';
-import { Entrar } from './paginas/Entrar.js';
-import { MinhaEvolucao } from './paginas/MinhaEvolucao.js';
-import { Paciente } from './paginas/Paciente.js';
-import { PacienteFormulario } from './paginas/PacienteFormulario.js';
-import { Pacientes } from './paginas/Pacientes.js';
-import { Anamnese } from './paginas/anamnese/Anamnese.js';
-import { NovaAnamnese } from './paginas/anamnese/NovaAnamnese.js';
-import { NovaAvaliacao } from './paginas/avaliacao/NovaAvaliacao.js';
+import { ProvedorDeSessao, useSessao } from './autenticacao/Sessao';
+import { RotaProtegida } from './autenticacao/RotaProtegida';
+import { Layout } from './componentes/Layout';
+import { Carregando } from './componentes/ui';
+import { Entrar } from './paginas/Entrar';
+import { Evolucao } from './paginas/Evolucao';
+import { MinhaEvolucao } from './paginas/MinhaEvolucao';
+import { Paciente } from './paginas/Paciente';
+import { PacienteFormulario } from './paginas/PacienteFormulario';
+import { Pacientes } from './paginas/Pacientes';
+import { Anamnese } from './paginas/anamnese/Anamnese';
+import { NovaAnamnese } from './paginas/anamnese/NovaAnamnese';
+import { NovaAvaliacao } from './paginas/avaliacao/NovaAvaliacao';
 
 export function App() {
   return (
@@ -50,6 +51,14 @@ export function App() {
               element={
                 <RotaProtegida perfilExigido="nutricionista">
                   <PacienteFormulario />
+                </RotaProtegida>
+              }
+            />
+            <Route
+              path="/pacientes/:id/evolucao"
+              element={
+                <RotaProtegida perfilExigido="nutricionista">
+                  <Evolucao />
                 </RotaProtegida>
               }
             />

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router';
-import { mensagem, useSessao } from '../autenticacao/Sessao.js';
-import { Aviso, Botao, Campo, Cartao } from '../componentes/ui.js';
-import { supabaseConfigurado } from '../dados/supabase.js';
+import { mensagem, useSessao } from '../autenticacao/Sessao';
+import { Aviso, Botao, Campo, Cartao } from '../componentes/ui';
+import { supabaseConfigurado } from '../dados/supabase';
 
 /** RF-01: login com e-mail e senha, com recuperação de senha. */
 export function Entrar() {

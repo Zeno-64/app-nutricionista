@@ -8,21 +8,25 @@
  * `docs/verificacao-formulas.md`.
  */
 
-export * from './tipos.js';
-export * from './erros.js';
-export * from './numeros.js';
-export * from './rotulos.js';
-export * from './validacao.js';
+export * from './tipos';
+export * from './erros';
+export * from './numeros';
+export * from './rotulos';
+export * from './validacao';
 
-export * from './antropometria/imc.js';
-export * from './antropometria/indices.js';
+export * from './antropometria/imc';
+export * from './antropometria/indices';
 
-export * from './composicao/siri.js';
-export * from './composicao/massas.js';
-export * from './composicao/protocolos.js';
-export * from './composicao/calcular.js';
+export * from './composicao/siri';
+export * from './composicao/massas';
+export * from './composicao/protocolos';
+export * from './composicao/calcular';
 
-export * from './energia/fatores-atividade.js';
-export * from './energia/formulas.js';
-export * from './energia/calcular.js';
-export * from './energia/meta.js';
+export * from './energia/fatores-atividade';
+export * from './energia/formulas';
+export * from './energia/calcular';
+export * from './energia/meta';
+
+export * from './evolucao/indicadores';
+export * from './evolucao/serie';
+export * from './evolucao/grafico';
