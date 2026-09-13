@@ -293,11 +293,17 @@ informado. **Não cancelar a Nutrio antes de concluir e validar a migração.**
 4. Prazo de guarda de prontuário exigido para nutrição — confirmar a norma vigente do CFN.
 5. Emissão de recibos (Receita Saúde) entra em qual fase?
 6. Videochamada integrada é necessária ou ele usa Meet/WhatsApp?
+7. Paciente fictício na Nutrio com o resultado de cada fórmula e protocolo, para servir de caso de teste (ver `docs/verificacao-formulas.md`).
 
-## 9. Decisões técnicas a tomar
+## 9. Decisões técnicas
 
-- Stack do app e do painel web, considerando um app com dois perfis e um painel web: Flutter (app e web) ou React Native/Expo com painel em React, compartilhando código TypeScript.
-- Backend e banco de dados, com isolamento por tenant.
-- Serviço de autenticação, armazenamento de arquivos e notificações push.
-- Provedor de hospedagem no Brasil.
-- Contas de desenvolvedor Apple e Google em nome de quem.
+| Tema | Decisão |
+|---|---|
+| App | React Native com Expo (expo-router), um app com dois perfis |
+| Painel web | React + Vite + Tailwind + TypeScript |
+| Backend | Supabase (Postgres, Auth, Storage) na região de São Paulo, com isolamento por tenant via RLS |
+| Organização | Monorepo com npm workspaces; cálculos num pacote compartilhado entre app, painel e importador |
+| Notificações push | Expo Notifications |
+
+Em aberto: nome do app e identificador nas lojas; contas de desenvolvedor Apple
+e Google em nome de quem.
