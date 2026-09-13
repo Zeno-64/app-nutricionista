@@ -94,7 +94,12 @@ percentual de gordura, e cinco dos oito dependem disso.
 | RF-62 | Avaliações liberadas com gráfico de evolução |
 
 Roda no Expo Go, no navegador e, com o `eas.json`, como app instalado — ver
-[testar-o-app.md](testar-o-app.md).
+[testar-o-app.md](testar-o-app.md). Ícone, splash e versão no rodapé são
+próprios; do template do Expo não sobrou nada.
+
+**Para mandar ao cliente falta só a conta na Expo**, que é do Kevin: `eas login`
+e `eas init` não têm como rodar daqui. O passo a passo, e o recado que vale
+mandar junto com o link, estão em [testar-o-app.md](testar-o-app.md).
 
 ## Falta
 
@@ -166,17 +171,18 @@ relatório.
   `com.appnutricionista.nutri` como provisórios. Trocar é de graça enquanto for
   só build de teste; depois de publicado numa loja, o identificador **não muda
   mais**
-- Ícone e splash próprios, no lugar dos do template
+- Ícone e splash definitivos, no lugar da folha provisória de
+  `apps/mobile/scripts/gerar-icones.mjs`
 - Política de privacidade publicada — Apple e Google exigem, e o app trata dado
   de saúde
 - Contas: Google Play (US$ 25, uma vez) e Apple Developer (US$ 99/ano)
 - Ligar a proteção contra senha vazada no painel do Supabase
-- Limpar as dependências que sobraram do template do Expo
 
 ## O que depende de você
 
 | O quê | Para quê |
 |---|---|
+| **Conta na Expo** | É o único passo que falta para o cliente instalar o app. O resto está pronto — ver [testar-o-app.md](testar-o-app.md) |
 | Prints do questionário de pré-consulta atual | Montar o modelo padrão da pré-consulta, como já foi feito com a anamnese |
 | Confirmar se a lista de fórmulas dos prints está completa | Pode ter ficado alguma entre um print e outro |
 | Paciente fictício na Nutrio com o resultado de cada fórmula | É metade da RN-06 — sem isso nenhuma fórmula é liberada |

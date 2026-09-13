@@ -66,7 +66,8 @@ Requisitos v0.2 fechados. Monorepo de pé, com as quatro partes andando:
   e, para o paciente, as avaliações liberadas com gráfico de evolução e a
   pré-consulta para responder. O
   gráfico, a linha do tempo e a lógica do formulário são as mesmas do painel,
-  em `@nutri/calculos`. Roda no Expo Go (`npm run mobile`) ou no navegador
+  em `@nutri/calculos`. Tem ícone, splash e versão no rodapé próprios — nada
+  mais do template do Expo. Roda no Expo Go (`npm run mobile`) ou no navegador
   (`npm run mobile:navegador`); para instalar no aparelho, o `eas.json` tem os
   perfis de build.
 
@@ -98,6 +99,11 @@ três pacotes, painel e app empacotam, console do navegador sem erro.
    As chaves estão no `.env` da raiz, fora do repositório.
 
 Pendências com o Kevin:
+- **Conta na Expo.** É o que falta para mandar o app instalável ao cliente: o
+  repositório já está pronto (perfis no `eas.json`, identificador, ícone,
+  versão no rodapé), mas `eas login` e `eas init` pedem uma conta que é dele.
+  Passo a passo em `docs/testar-o-app.md`. Ligando o repositório do GitHub ao
+  projeto da Expo, os builds seguintes podem ser disparados daqui.
 - Prints do questionário de pré-consulta atual.
 - Confirmar se a lista de fórmulas dos prints está completa.
 - Paciente fictício cadastrado na Nutrio com os resultados de cada fórmula e

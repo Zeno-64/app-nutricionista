@@ -80,6 +80,14 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 - **`/entrar` redireciona quem já tem sessão.** O `index.tsx` é quem sabe qual
   área abrir para cada perfil; a tela de login só o chama de volta. Sem isso o
   login dava certo e a tela não mudava.
+- **O ícone é desenhado em código,** em `scripts/gerar-icones.mjs`, e não vem de
+  um editor de imagem. Dá para gerar em qualquer tamanho, reler o que a marca é
+  e ajustar de onde não há editor — que é o caso do ambiente em nuvem onde parte
+  deste projeto foi escrita. É provisório de qualquer forma.
+- **A versão aparece no rodapé** do login e das duas áreas. Numa distribuição de
+  teste isso não é enfeite: o cliente relata um problema por mensagem, e é por
+  esse número que se sabe de qual build ele fala. O número entre parênteses é o
+  do build, que só existe no app instalado.
 
 ## O que falta
 
@@ -88,12 +96,10 @@ layout que confere o perfil e manda embora quem entrou na área errada.
   (`"67,8"`), do jeito que foi digitada. Serve para a pré-consulta, onde ninguém
   calcula em cima; a avaliação vai precisar de número de verdade.
 - Ver o próprio perfil e o do nutricionista (RF-60)
-- Responder pré-consulta, do lado do paciente (RF-61)
 - Notificação push (RF-63) e login por biometria (RF-06)
 - Rascunho local enquanto não sincroniza (RNF-07)
 - Nome do app e identificador nas lojas: ainda pendente com o Kevin. O `app.json`
   está com `Nutri` / `app-nutricionista` / `appnutricionista` como provisórios.
-- Limpar o que sobrou do template: `@expo/ui`, `expo-glass-effect`,
-  `expo-symbols`, `expo-image`, `expo-device`, `expo-font` e `expo-web-browser`
-  estão nas dependências e não são usados por nenhuma tela. Ícone e splash
-  também ainda são os do template.
+- Identidade visual: o ícone e o splash são uma folha provisória, gerada por
+  `npm run icones`. Servem para o app não se apresentar como o template do
+  Expo; não substituem a marca que o Kevin escolher.

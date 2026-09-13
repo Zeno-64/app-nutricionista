@@ -71,9 +71,13 @@ de cada testador. Sem pagar, no iPhone só resta o Expo Go, que precisa do seu
 computador rodando o servidor: serve para você mostrar o app, não para deixar
 alguém usar por conta.
 
+O repositório já está pronto para isso: `eas.json` tem os perfis, o `app.json`
+tem o identificador e o ícone, e o app mostra a versão no rodapé. **O que falta
+é a conta na Expo** — ela é sua, e não dá para criar daqui.
+
 ### Uma vez só
 
-Crie uma conta em https://expo.dev e, na raiz do projeto:
+**1. Conta e projeto.** Crie a conta em https://expo.dev e, no projeto:
 
 ```sh
 npm install -g eas-cli
@@ -81,18 +85,26 @@ eas login
 cd apps/mobile && eas init      # cria o projeto e grava o id no app.json
 ```
 
-**As chaves do Supabase precisam ir para o EAS.** É o passo que mais dá errado:
-as variáveis `EXPO_PUBLIC_*` são embutidas no momento do build, e o `.env` não
-vai para o repositório nem para a nuvem. Sem isso o build termina bem e o app
-abre dizendo que falta configurar o Supabase.
+O `eas init` acrescenta `extra.eas.projectId` e `owner` ao `app.json`. Commite:
+sem eles nenhum build sabe a que projeto pertence.
+
+**2. As chaves do Supabase.** É o passo que mais dá errado: as variáveis
+`EXPO_PUBLIC_*` são embutidas no momento do build, e o `.env` não vai para o
+repositório nem para a nuvem. Sem isso o build termina bem e o app abre dizendo
+que falta configurar o Supabase.
 
 ```sh
 eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_URL --value "https://igsbxhvoqqpuioajpfpi.supabase.co"
-eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "<a chave anônima>"
+eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "<a chave anônima, do .env>"
 ```
 
 O perfil `teste` do `eas.json` aponta para o ambiente `preview`, então é de lá
-que ele lê. `eas env:list` confere o que ficou gravado.
+que ele lê. `eas env:list --environment preview` confere o que ficou gravado.
+
+**3. Ligue o repositório do GitHub** ao projeto, no painel da Expo (*Project
+settings → GitHub*). Não é obrigatório para buildar da sua máquina, mas é o que
+permite disparar um build sem ela — inclusive de uma sessão do Claude Code, que
+alcança a API da Expo mas não tem como fazer `eas login`.
 
 ### A cada versão
 
@@ -106,6 +118,11 @@ Mande esse link para o cliente: ele abre no celular, baixa e instala. O Android
 pergunta se aceita instalar de fora da Play Store — é normal e ele só precisa
 confirmar.
 
+O número do build sobe sozinho a cada envio (`autoIncrement` no perfil `teste`),
+e é ele que aparece entre parênteses no rodapé do app. **Suba também o `version`
+do `app.json`** quando a mudança for grande o bastante para o cliente perceber —
+é por esse par que se sabe de qual versão ele está falando quando relata algo.
+
 Para iPhone, depois de pagar a conta Apple:
 
 ```sh
@@ -115,21 +132,48 @@ eas build --profile teste --platform ios --auto-submit
 Daí o cliente instala o **TestFlight** na App Store e aceita o convite que
 chega por e-mail. As versões seguintes aparecem sozinhas para ele.
 
+> O plano gratuito do EAS tem fila e limite de builds por mês. Para algumas
+> versões por mês, sobra.
+
+### O recado que vai junto
+
+Metade dos "defeitos" de um teste guiado é o testador descobrindo sozinho o que
+ainda não existe. Vale mandar algo assim junto com o link:
+
+> Este é um teste, não a versão final. Para entrar, use o e-mail e a senha que
+> te mandei — a lista de pacientes já vem com dados de demonstração, pode mexer
+> à vontade que nada aí é real.
+>
+> O que dá para fazer hoje: ver a lista e a ficha de cada paciente com a linha
+> do tempo, enviar uma pré-consulta e liberar uma avaliação para o paciente ver.
+> Entrando com a conta de paciente, dá para responder a pré-consulta e ver o
+> gráfico de evolução.
+>
+> O que ainda **não** funciona, e não precisa reportar:
+>
+> - **Nenhum cálculo de gordura corporal ou gasto energético sai.** É de
+>   propósito: as fórmulas só são ligadas depois de conferidas na publicação
+>   original, uma a uma.
+> - Não dá para cadastrar paciente, preencher avaliação nem anexar exame pelo
+>   celular — isso é pelo painel no computador.
+> - O ícone é provisório.
+>
+> Quando algo parecer errado, me manda o print **com o rodapé da tela de login
+> ou da lista**, onde aparece o número da versão.
+
 ### Antes de mandar, confira
 
 - **O identificador do app** está provisório: `com.appnutricionista.nutri`, no
   `app.json`. Enquanto for só teste, mudar é de graça — depois de publicado numa
   loja, **não muda mais**. Decida antes da primeira publicação.
-- **Ícone e splash** ainda são os do template do Expo. Funciona, mas parece
-  inacabado na tela de quem instalou.
-- **Nenhuma fórmula com coeficiente calcula** (RN-06). Se o cliente for testar
-  uma avaliação completa, avise antes — senão ele vai reportar como defeito o
-  que é uma trava proposital.
+- **O ícone é uma folha provisória**, gerada por
+  `npm run icones --workspace @nutri/mobile`. Não é mais o do Expo, mas também
+  não é identidade visual: quando você decidir a sua, troque os PNGs de
+  `apps/mobile/assets/images` ou as medidas do script que os gera.
+- **Nenhuma fórmula com coeficiente calcula** (RN-06) — está no recado acima
+  porque é o que mais confunde quem testa.
 - **O app precisa alcançar o Supabase.** Da rede do cliente isso funciona; do
   ambiente de nuvem onde parte do projeto foi escrito, não.
-
-> O plano gratuito do EAS tem fila e limite de builds por mês. Para algumas
-> versões por mês, sobra.
 
 ## 4. Nas lojas
 
@@ -139,7 +183,7 @@ três decisões suas, hoje provisórias em `apps/mobile/app.json`:
 - o nome que aparece na loja e embaixo do ícone (hoje `Nutri`)
 - o identificador do app (hoje `com.appnutricionista.nutri`), que **não muda
   depois de publicado**
-- ícone e splash próprios, no lugar dos do template
+- ícone e splash definitivos, no lugar da folha provisória
 
 E, do lado burocrático: conta Google Play (US$ 25, uma vez) e conta Apple
 Developer (US$ 99/ano), mais política de privacidade publicada — os dois
