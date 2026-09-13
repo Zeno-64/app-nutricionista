@@ -23,7 +23,7 @@ falta na tela de login, em vez de quebrar.
 | `/` | Redireciona conforme o perfil da conta |
 | `/entrar` | Qualquer um sem sessão |
 | `/pacientes` | Nutricionista — lista e busca |
-| `/pacientes/[id]` | Nutricionista — ficha e linha do tempo |
+| `/pacientes/[id]` | Nutricionista — ficha, linha do tempo e as ações da RF-57 |
 | `/evolucao` | Paciente — avaliações liberadas e gráfico de evolução |
 
 As duas áreas ficam em grupos (`(nutricionista)` e `(paciente)`), cada um com um
@@ -47,6 +47,14 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 - **O cabeçalho da ficha é o nativo,** só ele. A lista continua desenhando o
   próprio, porque tem busca e o botão de sair; da ficha em diante quem manda é
   o `Stack`, que traz o voltar e o gesto de arrastar da borda de graça.
+- **Confirmação na própria tela, não `Alert.alert`.** O `Alert` do React Native
+  é um método vazio no `react-native-web`: no navegador o botão não faria nada,
+  em silêncio — e é assim que as telas são conferidas aqui e que
+  `npm run mobile:navegador` abre o app. A confirmação em linha tem um caminho
+  de código só, funciona em toda plataforma e dá para testar.
+- **A sessão carrega o vínculo (`membros`) junto do perfil.** É de lá que sai o
+  `tenant_id` de qualquer gravação do nutricionista. O paciente não tem linha
+  em `membros`, e a consulta volta vazia sem erro.
 - **Imports relativos sem extensão:** o Metro não resolve o `.js` que o
   TypeScript aceita, e isso quebrava o bundle assim que o app passou a
   importar o pacote de cálculos.
@@ -64,7 +72,6 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 ## O que falta
 
 - Preencher anamnese e avaliação pelo celular (RF-56)
-- Enviar pré-consulta e liberar avaliação (RF-57)
 - Responder pré-consulta, do lado do paciente (RF-61)
 - Notificação push (RF-63) e login por biometria (RF-06)
 - Rascunho local enquanto não sincroniza (RNF-07)

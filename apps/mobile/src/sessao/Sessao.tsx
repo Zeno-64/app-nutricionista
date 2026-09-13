@@ -2,11 +2,13 @@ import type { User } from '@supabase/supabase-js';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { supabase, supabaseConfigurado } from '@/supabase/cliente';
-import type { Perfil } from '@/supabase/tipos';
+import type { Membro, Perfil } from '@/supabase/tipos';
 
 interface EstadoSessao {
   usuario: User | null;
   perfil: Perfil | null;
+  /** Só o nutricionista tem vínculo; é dele que sai o `tenant_id` ao gravar. */
+  membro: Membro | null;
   carregando: boolean;
   entrar: (email: string, senha: string) => Promise<void>;
   sair: () => Promise<void>;
@@ -18,6 +20,7 @@ const Contexto = createContext<EstadoSessao | null>(null);
 export function ProvedorDeSessao({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<User | null>(null);
   const [perfil, setPerfil] = useState<Perfil | null>(null);
+  const [membro, setMembro] = useState<Membro | null>(null);
   const [carregando, setCarregando] = useState(supabaseConfigurado);
 
   useEffect(() => {
@@ -35,6 +38,7 @@ export function ProvedorDeSessao({ children }: { children: ReactNode }) {
       setUsuario(sessao?.user ?? null);
       if (sessao === null) {
         setPerfil(null);
+        setMembro(null);
         setCarregando(false);
       }
     });
@@ -52,13 +56,20 @@ export function ProvedorDeSessao({ children }: { children: ReactNode }) {
     setCarregando(true);
 
     void (async () => {
-      const { data } = await supabase
-        .from('perfis')
-        .select('id, tipo, nome')
-        .eq('id', usuario.id)
-        .maybeSingle();
+      // A RLS já limita `membros` ao próprio usuário; o paciente simplesmente
+      // não tem linha lá, e a consulta volta vazia.
+      const [contaPerfil, contaMembro] = await Promise.all([
+        supabase.from('perfis').select('id, tipo, nome').eq('id', usuario.id).maybeSingle(),
+        supabase
+          .from('membros')
+          .select('id, tenant_id, papel, ativo')
+          .eq('usuario_id', usuario.id)
+          .eq('ativo', true)
+          .maybeSingle(),
+      ]);
       if (!ativo) return;
-      setPerfil((data as Perfil | null) ?? null);
+      setPerfil((contaPerfil.data as Perfil | null) ?? null);
+      setMembro((contaMembro.data as Membro | null) ?? null);
       setCarregando(false);
     })();
 
@@ -84,8 +95,8 @@ export function ProvedorDeSessao({ children }: { children: ReactNode }) {
   }, []);
 
   const valor = useMemo<EstadoSessao>(
-    () => ({ usuario, perfil, carregando, entrar, sair, recuperarSenha }),
-    [usuario, perfil, carregando, entrar, sair, recuperarSenha],
+    () => ({ usuario, perfil, membro, carregando, entrar, sair, recuperarSenha }),
+    [usuario, perfil, membro, carregando, entrar, sair, recuperarSenha],
   );
 
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;

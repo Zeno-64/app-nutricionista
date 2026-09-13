@@ -38,7 +38,15 @@ Uma coisa some nessa troca: **a RLS**. É o banco que decide o que o paciente
 enxerga (RN-03), e aqui é o roteiro que decide. Por isso a parte de permissão é
 testada no banco, em `supabase/testes/`, e não aqui.
 
-## Dois defeitos que ele já pegou
+## O que ele confere além do print
+
+As telas que gravam são exercitadas de verdade: o roteiro toca no botão,
+confirma e olha o que o app *tentou* escrever — que a liberação manda
+`liberada_em`, que a pré-consulta sai com `enviada_em` preenchido e que só as
+perguntas que se aplicam àquele paciente foram copiadas (RF-22). É o mais perto
+que dá de um teste de integração sem banco.
+
+## Três defeitos que ele já pegou
 
 Valem como exemplo do que só aparece com o app montado:
 
@@ -50,6 +58,10 @@ Valem como exemplo do que só aparece com o app montado:
   sendo a de login: `index.tsx` roteia por perfil, mas `/entrar` não mandava
   ninguém embora depois que a sessão passava a existir. Acontecia também ao
   reabrir o app já logado.
+- **`Alert.alert` não faz nada no navegador.** As confirmações de liberar
+  avaliação e enviar pré-consulta tinham nascido com o `Alert` do React Native,
+  que no `react-native-web` é um método vazio: o botão ficaria mudo para quem
+  abrisse o app pelo navegador. Viraram confirmação na própria tela.
 
 > Precisa do Playwright, no projeto ou global:
 > `npm install --no-save playwright && npx playwright install chromium`.

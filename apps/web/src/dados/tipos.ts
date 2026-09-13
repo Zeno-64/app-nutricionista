@@ -1,4 +1,4 @@
-import type { FormulaEnergiaId, ProtocoloId, Sexo } from '@nutri/calculos';
+import type { FormulaEnergiaId, GrupoPaciente, ProtocoloId, Sexo } from '@nutri/calculos';
 
 /**
  * Espelho das tabelas que o painel usa. No projeto com o Supabase ligado, dá
@@ -9,20 +9,9 @@ import type { FormulaEnergiaId, ProtocoloId, Sexo } from '@nutri/calculos';
 export type PerfilTipo = 'nutricionista' | 'paciente';
 export type StatusRegistro = 'rascunho' | 'finalizada';
 export type TipoFormulario = 'anamnese' | 'pre_consulta';
-export type TipoPergunta =
-  | 'texto_longo'
-  | 'texto_curto'
-  | 'numero'
-  | 'sim_nao'
-  | 'multipla_escolha'
-  | 'escala_0_10'
-  | 'data';
-export type GrupoPaciente =
-  | 'adulto'
-  | 'crianca_adolescente'
-  | 'gestante'
-  | 'lactante'
-  | 'atleta';
+// Vocabulário compartilhado com o app: o tipo da pergunta e os grupos do
+// paciente valem igual nos dois, então quem define é `@nutri/calculos`.
+export type { GrupoPaciente, TipoPergunta } from '@nutri/calculos';
 
 export interface Perfil {
   id: string;

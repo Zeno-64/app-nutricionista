@@ -1,3 +1,5 @@
+import type { AvaliacaoDaLinhaDoTempo } from '@nutri/calculos';
+
 /** Recorte das tabelas que o app usa. Espelha as migrations de `supabase/`. */
 
 export type PerfilTipo = 'nutricionista' | 'paciente';
@@ -33,6 +35,22 @@ export interface PacienteCompleto extends Paciente {
   profissao: string | null;
   observacoes: string | null;
   grupos: GrupoPaciente[];
+}
+
+/**
+ * A avaliação como a ficha precisa dela: o que a linha do tempo lê, mais a
+ * marca de liberação, que é o que o botão de liberar liga e desliga (RN-03).
+ */
+export interface AvaliacaoDaFicha extends AvaliacaoDaLinhaDoTempo {
+  liberada_em: string | null;
+}
+
+/** Vínculo do nutricionista com o consultório. É de lá que sai o `tenant_id`. */
+export interface Membro {
+  id: string;
+  tenant_id: string;
+  papel: 'proprietario' | 'colaborador';
+  ativo: boolean;
 }
 
 export interface Anamnese {

@@ -63,6 +63,20 @@ const pacientes = [
   },
 ];
 
+const membro = { id: 'm1', tenant_id: TENANT, papel: 'proprietario', ativo: true };
+
+const modeloPreConsulta = { id: 'mod-pre', nome: 'Pré-consulta padrão', padrao: true };
+const secoesDoModelo = [{ id: 's1', ordem: 1, titulo: 'Antes da consulta' }];
+
+// A terceira pergunta é condicional (RF-22): só vale para paciente do sexo
+// feminino. Como a demonstração é a Marina, ela tem de sair nas respostas.
+const perguntasDoModelo = [
+  { id: 'p1', secao_id: 's1', ordem: 1, enunciado: 'Como foi a semana?', tipo: 'texto_longo', opcoes: null, obrigatoria: false, condicao: null },
+  { id: 'p2', secao_id: 's1', ordem: 2, enunciado: 'Peso de hoje', tipo: 'numero', opcoes: null, obrigatoria: false, condicao: null },
+  { id: 'p3', secao_id: 's1', ordem: 3, enunciado: 'Como está o ciclo menstrual?', tipo: 'texto_longo', opcoes: null, obrigatoria: false, condicao: { campo: 'sexo', igual: 'feminino' } },
+  { id: 'p4', secao_id: 's1', ordem: 4, enunciado: 'Treinou quantas vezes?', tipo: 'numero', opcoes: null, obrigatoria: false, condicao: { campo: 'grupo', igual: 'atleta' } },
+];
+
 const anamneses = [
   {
     id: 'ffffffff-ffff-4fff-8fff-000000000002',
@@ -95,21 +109,22 @@ const avaliacoes = [
     peso: 68, imc: 24.98, imc_classificacao: 'Eutrofia', percentual_gordura: 26.8,
     massa_gorda: 18.22, massa_livre_gordura: 49.78, gasto_energetico_total: 1900,
     circ_cintura: 80, circ_abdomen: 83, circ_quadril: 99, ...semMedidas,
-    status: 'finalizada', origem: 'local',
+    // A mais recente ainda não foi liberada: é nela que o roteiro toca.
+    status: 'finalizada', origem: 'local', liberada_em: null,
   },
   {
     id: 'av2', data_avaliacao: '2026-05-10', versao: 1, substituida_por_id: null,
     peso: 70.5, imc: 25.9, imc_classificacao: 'Sobrepeso', percentual_gordura: 29.4,
     massa_gorda: 20.73, massa_livre_gordura: 49.77, gasto_energetico_total: 1930,
     circ_cintura: 84, circ_abdomen: 87, circ_quadril: 101, ...semMedidas,
-    status: 'finalizada', origem: 'local',
+    status: 'finalizada', origem: 'local', liberada_em: '2026-05-10T14:00:00Z',
   },
   {
     id: 'av1', data_avaliacao: '2026-03-01', versao: 1, substituida_por_id: null,
     peso: 74, imc: 27.18, imc_classificacao: 'Sobrepeso', percentual_gordura: 32.1,
     massa_gorda: 23.75, massa_livre_gordura: 50.25, gasto_energetico_total: 1980,
     circ_cintura: 89, circ_abdomen: 92, circ_quadril: 104, ...semMedidas,
-    status: 'finalizada', origem: 'local',
+    status: 'finalizada', origem: 'local', liberada_em: '2026-03-01T14:00:00Z',
   },
 ];
 
@@ -178,6 +193,7 @@ pagina.on('console', (m) => {
 pagina.on('pageerror', (e) => problemas.push(e.message));
 
 let quemEntrou = null;
+const gravacoes = [];
 
 const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
 
@@ -204,8 +220,6 @@ await pagina.route(`${SUPABASE}/**`, (rota) => {
   const json = (dados, status = 200) =>
     rota.fulfill({ status, contentType: 'application/json', body: JSON.stringify(dados) });
 
-  if (url.pathname.includes('/rest/v1/rpc/')) return json(null);
-
   if (url.pathname.startsWith('/auth/v1/')) {
     if (url.pathname.endsWith('/logout')) {
       quemEntrou = null;
@@ -226,6 +240,15 @@ await pagina.route(`${SUPABASE}/**`, (rota) => {
   const tabela = url.pathname.replace('/rest/v1/', '');
   const objeto = (req.headers()['accept'] ?? '').includes('pgrst.object');
 
+  if (tabela.startsWith('rpc/')) return json(null);
+
+  // Guarda o que o app tentou escrever, para o roteiro conferir no fim. Só
+  // depois da autenticação: o login também é um POST.
+  if (req.method() === 'PATCH' || req.method() === 'POST') {
+    gravacoes.push({ metodo: req.method(), tabela, corpo: req.postDataJSON() });
+    return json(objeto ? { id: 'nova-pre-consulta' } : []);
+  }
+
   let dados = [];
   if (tabela === 'perfis') {
     dados = [perfis[quemEntrou]];
@@ -242,6 +265,14 @@ await pagina.route(`${SUPABASE}/**`, (rota) => {
     dados = avaliacoes;
   } else if (tabela === 'anamneses') {
     dados = anamneses;
+  } else if (tabela === 'membros') {
+    dados = quemEntrou === 'nutri@demo.test' ? [membro] : [];
+  } else if (tabela === 'modelos_formulario') {
+    dados = [modeloPreConsulta];
+  } else if (tabela === 'secoes_modelo') {
+    dados = secoesDoModelo;
+  } else if (tabela === 'perguntas_modelo') {
+    dados = perguntasDoModelo;
   }
 
   return json(objeto ? (dados[0] ?? null) : dados);
@@ -282,6 +313,37 @@ await pagina.getByText('Marina Costa', { exact: true }).click();
 await pagina.waitForTimeout(1300);
 console.log('  rota da ficha:', new URL(pagina.url()).pathname);
 await print('04-ficha-paciente');
+
+// 3b. RN-03: liberar a avaliação mais recente para o paciente
+await pagina.getByText('Liberar para o paciente', { exact: true }).first().click();
+await pagina.waitForTimeout(400);
+await print('05-confirmar-liberacao');
+await pagina.getByText('Liberar', { exact: true }).click();
+await pagina.waitForTimeout(900);
+
+const liberou = gravacoes.find((g) => g.tabela === 'avaliacoes' && g.metodo === 'PATCH');
+console.log(
+  '  liberou avaliação:',
+  liberou === undefined ? 'NÃO' : `sim, liberada_em=${liberou.corpo.liberada_em !== null}`,
+);
+
+// 3c. RF-57: enviar a pré-consulta, com as perguntas filtradas por RF-22
+await pagina.getByText('Enviar pré-consulta', { exact: true }).click();
+await pagina.waitForTimeout(400);
+await print('06-confirmar-pre-consulta');
+await pagina.getByText('Enviar', { exact: true }).click();
+await pagina.waitForTimeout(1200);
+
+const criou = gravacoes.find((g) => g.tabela === 'anamneses' && g.metodo === 'POST');
+const respostasGravadas = gravacoes.find((g) => g.tabela === 'respostas_anamnese');
+console.log('  criou pré-consulta:', criou === undefined ? 'NÃO' : `sim, tipo=${criou.corpo.tipo}, enviada=${criou.corpo.enviada_em !== null}`);
+console.log(
+  '  perguntas copiadas:',
+  respostasGravadas === undefined
+    ? 'NENHUMA'
+    : respostasGravadas.corpo.map((r) => r.enunciado).join(' | '),
+);
+
 await pagina.goBack();
 await pagina.waitForTimeout(1000);
 console.log('  voltou para:', new URL(pagina.url()).pathname);
@@ -292,9 +354,9 @@ await pagina.waitForTimeout(1200);
 // 4. Paciente: evolução
 await entrar('paciente@demo.test');
 console.log('  rota após entrar como paciente:', new URL(pagina.url()).pathname);
-await print('05-evolucao');
+await print('07-evolucao');
 await pagina.getByText('Gordura corporal', { exact: true }).click();
-await print('06-evolucao-gordura');
+await print('08-evolucao-gordura');
 
 console.log(
   '\nErros no console:',

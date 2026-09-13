@@ -6,28 +6,46 @@ import {
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Aviso, Carregando, Texto } from '@/componentes/ui';
+import { Aviso, Botao, Carregando, Texto } from '@/componentes/ui';
 import { Cores, Espaco } from '@/constantes/tema';
-import { mensagem } from '@/sessao/Sessao';
+import { mensagem, useSessao } from '@/sessao/Sessao';
 import {
   carregarPaciente,
+  definirLiberacao,
+  enviarPreConsulta,
   listarAnamnesesDaFicha,
   listarAvaliacoesDaFicha,
   registrarVisualizacao,
 } from '@/supabase/consultas';
-import type { GrupoPaciente, PacienteCompleto } from '@/supabase/tipos';
+import type { AvaliacaoDaFicha, GrupoPaciente, PacienteCompleto } from '@/supabase/tipos';
 
 interface Ficha {
   paciente: PacienteCompleto;
   itens: ItemLinhaDoTempo[];
+  /** Indexada por id para o botão de liberar achar a avaliação da linha. */
+  avaliacoes: Map<string, AvaliacaoDaFicha>;
+}
+
+interface Confirmacao {
+  /** Onde ela aparece: `pre-consulta` ou o id da avaliação. */
+  chave: string;
+  pergunta: string;
+  rotulo: string;
+  acao: () => Promise<void>;
 }
 
 /** RF-55 e RF-13: ficha do paciente e linha do tempo no celular. */
 export default function FichaDoPaciente() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { usuario, membro } = useSessao();
   const [ficha, setFicha] = useState<Ficha | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [atualizando, setAtualizando] = useState(false);
+  const [ocupado, setOcupado] = useState(false);
+  // A confirmação é uma linha na própria tela, não um diálogo do sistema: o
+  // `Alert` do React Native não faz nada no navegador, e é assim que o app é
+  // conferido aqui e aberto por `npm run mobile:navegador`.
+  const [confirmacao, setConfirmacao] = useState<Confirmacao | null>(null);
 
   const carregar = useCallback(async (): Promise<Ficha> => {
     const [paciente, avaliacoes, anamneses] = await Promise.all([
@@ -36,7 +54,11 @@ export default function FichaDoPaciente() {
       listarAnamnesesDaFicha(id),
     ]);
     if (paciente === null) throw new Error('Paciente não encontrado.');
-    return { paciente, itens: montarLinhaDoTempo(avaliacoes, anamneses) };
+    return {
+      paciente,
+      itens: montarLinhaDoTempo(avaliacoes, anamneses),
+      avaliacoes: new Map(avaliacoes.map((avaliacao) => [avaliacao.id, avaliacao])),
+    };
   }, [id]);
 
   useEffect(() => {
@@ -69,6 +91,66 @@ export default function FichaDoPaciente() {
     }
   }
 
+  /** Uma ação que grava: trava a tela, recarrega no fim e nunca engole o erro. */
+  async function executar(acao: () => Promise<void>) {
+    setConfirmacao(null);
+    setOcupado(true);
+    try {
+      await acao();
+      setFicha(await carregar());
+      setErro(null);
+    } catch (falha) {
+      setErro(mensagem(falha));
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  function aoEnviarPreConsulta() {
+    if (ficha === null) return;
+    const { paciente } = ficha;
+
+    if (membro === null || usuario === null) {
+      setErro('Sessão sem vínculo de consultório. Entre de novo.');
+      return;
+    }
+    if (paciente.usuario_id === null) {
+      setErro(
+        'Este paciente ainda não tem acesso ao app, então não teria como responder. ' +
+          'Convide-o pelo painel primeiro.',
+      );
+      return;
+    }
+
+    setErro(null);
+    setConfirmacao({
+      chave: 'pre-consulta',
+      pergunta: `${paciente.nome} recebe o questionário para responder pelo app.`,
+      rotulo: 'Enviar',
+      acao: () =>
+        enviarPreConsulta({
+          tenantId: membro.tenant_id,
+          pacienteId: paciente.id,
+          usuarioId: usuario.id,
+          sexo: paciente.sexo,
+          grupos: paciente.grupos,
+        }).then(() => undefined),
+    });
+  }
+
+  function aoTrocarLiberacao(avaliacao: AvaliacaoDaFicha) {
+    const liberando = avaliacao.liberada_em === null;
+    setErro(null);
+    setConfirmacao({
+      chave: avaliacao.id,
+      pergunta: liberando
+        ? 'O paciente passa a ver esta avaliação no app dele.'
+        : 'O paciente deixa de ver esta avaliação. O registro continua aqui.',
+      rotulo: liberando ? 'Liberar' : 'Ocultar',
+      acao: () => definirLiberacao('avaliacoes', avaliacao.id, liberando),
+    });
+  }
+
   // O título do cabeçalho nativo é o nome do paciente assim que ele chega.
   const titulo = ficha?.paciente.nome ?? 'Ficha';
 
@@ -92,7 +174,7 @@ export default function FichaDoPaciente() {
     );
   }
 
-  const { paciente, itens } = ficha;
+  const { paciente, itens, avaliacoes } = ficha;
 
   return (
     <View style={estilos.tela}>
@@ -143,24 +225,98 @@ export default function FichaDoPaciente() {
           )}
         </View>
 
+        {/* RF-57: as duas ações que fazem sentido no celular, entre consultas. */}
+        <View style={estilos.acoes}>
+          {confirmacao !== null && confirmacao.chave === 'pre-consulta' ? (
+            <Confirmar
+              confirmacao={confirmacao}
+              ocupado={ocupado}
+              aoConfirmar={() => void executar(confirmacao.acao)}
+              aoCancelar={() => setConfirmacao(null)}
+            />
+          ) : (
+            <Botao variante="secundario" aoTocar={aoEnviarPreConsulta} desabilitado={ocupado}>
+              Enviar pré-consulta
+            </Botao>
+          )}
+        </View>
+
         <Text style={estilos.subtitulo}>Linha do tempo</Text>
 
         {itens.length === 0 ? (
           <Text style={estilos.vazio}>Nenhuma anamnese ou avaliação registrada ainda.</Text>
         ) : (
-          itens.map((item) => (
-            <View key={`${item.tipo}-${item.id}`} style={estilos.item}>
-              <Text style={estilos.data}>{formatarData(item.data)}</Text>
-              <View style={estilos.linhaItem}>
-                <Text style={estilos.titulo}>{item.titulo}</Text>
-                {item.status === 'rascunho' && <Text style={estilos.etiqueta}>Rascunho</Text>}
-                {item.origem === 'nutrio' && <Text style={estilos.etiqueta}>Nutrio</Text>}
+          itens.map((item) => {
+            const avaliacao = item.tipo === 'avaliacao' ? avaliacoes.get(item.id) : undefined;
+            const liberada = avaliacao !== undefined && avaliacao.liberada_em !== null;
+
+            return (
+              <View key={`${item.tipo}-${item.id}`} style={estilos.item}>
+                <Text style={estilos.data}>{formatarData(item.data)}</Text>
+                <View style={estilos.linhaItem}>
+                  <Text style={estilos.titulo}>{item.titulo}</Text>
+                  {item.status === 'rascunho' && <Text style={estilos.etiqueta}>Rascunho</Text>}
+                  {item.origem === 'nutrio' && <Text style={estilos.etiqueta}>Nutrio</Text>}
+                  {liberada && <Text style={estilos.etiquetaLiberada}>Liberada</Text>}
+                </View>
+                {item.detalhe !== null && <Text style={estilos.detalhe}>{item.detalhe}</Text>}
+
+                {/* RN-03: só a avaliação finalizada vale ser liberada. */}
+                {avaliacao !== undefined && avaliacao.status === 'finalizada' && (
+                  <View style={estilos.acaoDoItem}>
+                    {confirmacao !== null && confirmacao.chave === avaliacao.id ? (
+                      <Confirmar
+                        confirmacao={confirmacao}
+                        ocupado={ocupado}
+                        aoConfirmar={() => void executar(confirmacao.acao)}
+                        aoCancelar={() => setConfirmacao(null)}
+                      />
+                    ) : (
+                      <Botao
+                        variante="secundario"
+                        desabilitado={ocupado}
+                        aoTocar={() => aoTrocarLiberacao(avaliacao)}
+                      >
+                        {liberada ? 'Ocultar do paciente' : 'Liberar para o paciente'}
+                      </Botao>
+                    )}
+                  </View>
+                )}
               </View>
-              {item.detalhe !== null && <Text style={estilos.detalhe}>{item.detalhe}</Text>}
-            </View>
-          ))
+            );
+          })
         )}
       </ScrollView>
+    </View>
+  );
+}
+
+function Confirmar({
+  confirmacao,
+  ocupado,
+  aoConfirmar,
+  aoCancelar,
+}: {
+  confirmacao: Confirmacao;
+  ocupado: boolean;
+  aoConfirmar: () => void;
+  aoCancelar: () => void;
+}) {
+  return (
+    <View style={estilos.confirmacao}>
+      <Text style={estilos.detalhe}>{confirmacao.pergunta}</Text>
+      <View style={estilos.botoesConfirmacao}>
+        <View style={estilos.botaoConfirmacao}>
+          <Botao variante="secundario" aoTocar={aoCancelar} desabilitado={ocupado}>
+            Cancelar
+          </Botao>
+        </View>
+        <View style={estilos.botaoConfirmacao}>
+          <Botao aoTocar={aoConfirmar} desabilitado={ocupado}>
+            {ocupado ? 'Gravando…' : confirmacao.rotulo}
+          </Botao>
+        </View>
+      </View>
     </View>
   );
 }
@@ -226,6 +382,11 @@ const estilos = StyleSheet.create({
   dados: { flexDirection: 'row', flexWrap: 'wrap', gap: Espaco.medio, marginTop: 4 },
   dado: { minWidth: 130 },
   observacoes: { marginTop: 4, gap: 2 },
+  acoes: { marginTop: Espaco.pequeno },
+  acaoDoItem: { marginTop: Espaco.pequeno },
+  confirmacao: { gap: Espaco.pequeno },
+  botoesConfirmacao: { flexDirection: 'row', gap: Espaco.pequeno },
+  botaoConfirmacao: { flex: 1 },
   subtitulo: {
     marginTop: Espaco.medio,
     fontSize: 13,
@@ -252,6 +413,15 @@ const estilos = StyleSheet.create({
     fontSize: 12,
     color: Cores.textoSuave,
     backgroundColor: Cores.fundo,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    overflow: 'hidden',
+  },
+  etiquetaLiberada: {
+    fontSize: 12,
+    color: Cores.primaria,
+    backgroundColor: Cores.primariaClara,
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 2,

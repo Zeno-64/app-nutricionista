@@ -35,3 +35,4 @@ export * from './evolucao/serie';
 export * from './evolucao/grafico';
 
 export * from './paciente/linhaDoTempo';
+export * from './formulario/anamnese';
