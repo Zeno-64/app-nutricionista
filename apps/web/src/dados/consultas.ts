@@ -82,7 +82,13 @@ export async function listarAnamneses(pacienteId: string): Promise<Anamnese[]> {
   return (data ?? []) as Anamnese[];
 }
 
-/** RNF-11: a visualização de prontuário também entra na auditoria. */
+/**
+ * RNF-11: a visualização de prontuário também entra na auditoria.
+ *
+ * Falhar aqui não derruba a tela: registrar é obrigação nossa, não de quem só
+ * quis abrir a ficha. O erro vai para o console, e a trilha do banco continua
+ * sendo a fonte da verdade sobre o que foi gravado.
+ */
 export async function registrarVisualizacao(
   tabela: string,
   registroId: string,
@@ -93,7 +99,7 @@ export async function registrarVisualizacao(
     p_registro: registroId,
     p_paciente: pacienteId,
   });
-  if (error) throw error;
+  if (error) console.warn('Não foi possível registrar a visualização:', error.message);
 }
 
 // ---------------------------------------------------------------------------

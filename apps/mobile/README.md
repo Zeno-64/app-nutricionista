@@ -22,7 +22,8 @@ falta na tela de login, em vez de quebrar.
 |---|---|
 | `/` | Redireciona conforme o perfil da conta |
 | `/entrar` | Qualquer um sem sessão |
-| `/pacientes` | Nutricionista |
+| `/pacientes` | Nutricionista — lista e busca |
+| `/pacientes/[id]` | Nutricionista — ficha e linha do tempo |
 | `/evolucao` | Paciente — avaliações liberadas e gráfico de evolução |
 
 As duas áreas ficam em grupos (`(nutricionista)` e `(paciente)`), cada um com um
@@ -38,6 +39,14 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 - **O gráfico compartilha a geometria com o painel.** `@nutri/calculos`
   devolve as coordenadas e o `path` do SVG; o `react-native-svg` daqui e o
   `<svg>` do navegador desenham exatamente a mesma linha.
+- **A linha do tempo também é compartilhada,** pelo mesmo motivo: o que ela
+  esconde (versão substituída, RN-02) e o que ela cobra (pré-consulta sem
+  resposta) são regras clínicas, não decisão de tela. Mora em
+  `@nutri/calculos`, com tipos de entrada estruturais que o DTO do app e o do
+  painel satisfazem sem conversão.
+- **O cabeçalho da ficha é o nativo,** só ele. A lista continua desenhando o
+  próprio, porque tem busca e o botão de sair; da ficha em diante quem manda é
+  o `Stack`, que traz o voltar e o gesto de arrastar da borda de graça.
 - **Imports relativos sem extensão:** o Metro não resolve o `.js` que o
   TypeScript aceita, e isso quebrava o bundle assim que o app passou a
   importar o pacote de cálculos.
@@ -54,7 +63,6 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 
 ## O que falta
 
-- Ficha e linha do tempo do paciente no celular (RF-55)
 - Preencher anamnese e avaliação pelo celular (RF-56)
 - Enviar pré-consulta e liberar avaliação (RF-57)
 - Responder pré-consulta, do lado do paciente (RF-61)

@@ -1,10 +1,11 @@
+import { Link } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Aviso, Botao, Campo, Carregando, Texto, Titulo } from '@/componentes/ui';
 import { Cores, Espaco } from '@/constantes/tema';
 import { mensagem, useSessao } from '@/sessao/Sessao';
-import { exigirSupabase } from '@/supabase/cliente';
+import { listarPacientes } from '@/supabase/consultas';
 import type { Paciente } from '@/supabase/tipos';
 
 /** RF-55: lista e busca de pacientes no celular. */
@@ -15,19 +16,7 @@ export default function Pacientes() {
   const [erro, setErro] = useState<string | null>(null);
   const [atualizando, setAtualizando] = useState(false);
 
-  const carregar = useCallback(async (termo: string) => {
-    let consulta = exigirSupabase()
-      .from('pacientes')
-      .select('id, nome, objetivo, arquivado_em, usuario_id, origem')
-      .is('arquivado_em', null)
-      .order('nome');
-
-    if (termo.trim() !== '') consulta = consulta.ilike('nome', `%${termo.trim()}%`);
-
-    const { data, error } = await consulta;
-    if (error) throw error;
-    return (data ?? []) as Paciente[];
-  }, []);
+  const carregar = useCallback((termo: string) => listarPacientes(termo), []);
 
   useEffect(() => {
     let ativo = true;
@@ -100,16 +89,22 @@ export default function Pacientes() {
             </Text>
           }
           renderItem={({ item }) => (
-            <View style={estilos.item}>
-              <Text style={estilos.nome}>{item.nome}</Text>
-              <View style={estilos.detalhes}>
-                {item.objetivo !== null && <Text style={estilos.detalhe}>{item.objetivo}</Text>}
-                {item.origem === 'nutrio' && <Text style={estilos.etiqueta}>Nutrio</Text>}
-                {item.usuario_id === null && (
-                  <Text style={estilos.etiqueta}>Sem acesso ao app</Text>
-                )}
-              </View>
-            </View>
+            <Link href={`/pacientes/${item.id}`} asChild>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Abrir a ficha de ${item.nome}`}
+                style={({ pressed }) => [estilos.item, pressed && estilos.itemTocado]}
+              >
+                <Text style={estilos.nome}>{item.nome}</Text>
+                <View style={estilos.detalhes}>
+                  {item.objetivo !== null && <Text style={estilos.detalhe}>{item.objetivo}</Text>}
+                  {item.origem === 'nutrio' && <Text style={estilos.etiqueta}>Nutrio</Text>}
+                  {item.usuario_id === null && (
+                    <Text style={estilos.etiqueta}>Sem acesso ao app</Text>
+                  )}
+                </View>
+              </Pressable>
+            </Link>
           )}
         />
       )}
@@ -132,6 +127,7 @@ const estilos = StyleSheet.create({
     padding: Espaco.medio,
     gap: 4,
   },
+  itemTocado: { opacity: 0.6 },
   nome: { fontSize: 16, fontWeight: '600', color: Cores.texto },
   detalhes: { flexDirection: 'row', flexWrap: 'wrap', gap: Espaco.pequeno },
   detalhe: { fontSize: 13, color: Cores.textoSuave },

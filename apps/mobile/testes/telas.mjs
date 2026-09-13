@@ -38,6 +38,13 @@ const pacientes = [
     arquivado_em: null,
     usuario_id: PACIENTE,
     origem: 'local',
+    data_nascimento: '1992-04-18',
+    sexo: 'feminino',
+    telefone: '(11) 97777-0002',
+    email: 'paciente@demo.test',
+    profissao: 'Analista de sistemas',
+    observacoes: 'Treina musculação 4x por semana. Relata sono irregular.',
+    grupos: ['adulto'],
   },
   {
     id: 'dddddddd-dddd-4ddd-8ddd-000000000002',
@@ -46,6 +53,32 @@ const pacientes = [
     arquivado_em: null,
     usuario_id: null,
     origem: 'nutrio',
+    data_nascimento: '1985-11-02',
+    sexo: 'masculino',
+    telefone: null,
+    email: null,
+    profissao: null,
+    observacoes: null,
+    grupos: ['adulto', 'atleta'],
+  },
+];
+
+const anamneses = [
+  {
+    id: 'ffffffff-ffff-4fff-8fff-000000000002',
+    tipo: 'pre_consulta',
+    status: 'rascunho',
+    data_registro: '2026-09-13',
+    respondida_em: null,
+    origem: 'local',
+  },
+  {
+    id: 'ffffffff-ffff-4fff-8fff-000000000001',
+    tipo: 'anamnese',
+    status: 'finalizada',
+    data_registro: '2026-03-01',
+    respondida_em: null,
+    origem: 'local',
   },
 ];
 
@@ -62,18 +95,21 @@ const avaliacoes = [
     peso: 68, imc: 24.98, imc_classificacao: 'Eutrofia', percentual_gordura: 26.8,
     massa_gorda: 18.22, massa_livre_gordura: 49.78, gasto_energetico_total: 1900,
     circ_cintura: 80, circ_abdomen: 83, circ_quadril: 99, ...semMedidas,
+    status: 'finalizada', origem: 'local',
   },
   {
     id: 'av2', data_avaliacao: '2026-05-10', versao: 1, substituida_por_id: null,
     peso: 70.5, imc: 25.9, imc_classificacao: 'Sobrepeso', percentual_gordura: 29.4,
     massa_gorda: 20.73, massa_livre_gordura: 49.77, gasto_energetico_total: 1930,
     circ_cintura: 84, circ_abdomen: 87, circ_quadril: 101, ...semMedidas,
+    status: 'finalizada', origem: 'local',
   },
   {
     id: 'av1', data_avaliacao: '2026-03-01', versao: 1, substituida_por_id: null,
     peso: 74, imc: 27.18, imc_classificacao: 'Sobrepeso', percentual_gordura: 32.1,
     massa_gorda: 23.75, massa_livre_gordura: 50.25, gasto_energetico_total: 1980,
     circ_cintura: 89, circ_abdomen: 92, circ_quadril: 104, ...semMedidas,
+    status: 'finalizada', origem: 'local',
   },
 ];
 
@@ -168,6 +204,8 @@ await pagina.route(`${SUPABASE}/**`, (rota) => {
   const json = (dados, status = 200) =>
     rota.fulfill({ status, contentType: 'application/json', body: JSON.stringify(dados) });
 
+  if (url.pathname.includes('/rest/v1/rpc/')) return json(null);
+
   if (url.pathname.startsWith('/auth/v1/')) {
     if (url.pathname.endsWith('/logout')) {
       quemEntrou = null;
@@ -192,11 +230,18 @@ await pagina.route(`${SUPABASE}/**`, (rota) => {
   if (tabela === 'perfis') {
     dados = [perfis[quemEntrou]];
   } else if (tabela === 'pacientes') {
-    // A RLS é do banco; aqui só imita o `ilike` da busca, que é o que a tela faz.
-    const termo = (url.searchParams.get('nome') ?? '').replace(/^ilike\.%|%$/g, '').toLowerCase();
-    dados = pacientes.filter((p) => p.nome.toLowerCase().includes(termo));
+    const porId = url.searchParams.get('id');
+    if (porId !== null) {
+      dados = pacientes.filter((p) => p.id === porId.replace(/^eq\./, ''));
+    } else {
+      // A RLS é do banco; aqui só imita o `ilike` da busca, que é o que a tela faz.
+      const termo = (url.searchParams.get('nome') ?? '').replace(/^ilike\.%|%$/g, '').toLowerCase();
+      dados = pacientes.filter((p) => p.nome.toLowerCase().includes(termo));
+    }
   } else if (tabela === 'avaliacoes') {
-    dados = quemEntrou === 'paciente@demo.test' ? avaliacoes : [];
+    dados = avaliacoes;
+  } else if (tabela === 'anamneses') {
+    dados = anamneses;
   }
 
   return json(objeto ? (dados[0] ?? null) : dados);
@@ -229,15 +274,27 @@ console.log('  rota após entrar como nutricionista:', new URL(pagina.url()).pat
 await print('02-pacientes');
 await pagina.locator('input').first().fill('rafa');
 await print('03-pacientes-busca');
+await pagina.locator('input').first().fill('');
+await pagina.waitForTimeout(600);
+
+// 3. Ficha e linha do tempo, abertas pela lista (RF-55, RF-13)
+await pagina.getByText('Marina Costa', { exact: true }).click();
+await pagina.waitForTimeout(1300);
+console.log('  rota da ficha:', new URL(pagina.url()).pathname);
+await print('04-ficha-paciente');
+await pagina.goBack();
+await pagina.waitForTimeout(1000);
+console.log('  voltou para:', new URL(pagina.url()).pathname);
+
 await pagina.getByText('Sair', { exact: true }).last().click();
 await pagina.waitForTimeout(1200);
 
-// 3. Paciente: evolução
+// 4. Paciente: evolução
 await entrar('paciente@demo.test');
 console.log('  rota após entrar como paciente:', new URL(pagina.url()).pathname);
-await print('04-evolucao');
+await print('05-evolucao');
 await pagina.getByText('Gordura corporal', { exact: true }).click();
-await print('05-evolucao-gordura');
+await print('06-evolucao-gordura');
 
 console.log(
   '\nErros no console:',

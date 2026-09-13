@@ -132,13 +132,5 @@ export interface Anexo {
   criado_em: string;
 }
 
-/** Uma entrada da linha do tempo do paciente (RF-13). */
-export interface ItemLinhaDoTempo {
-  id: string;
-  tipo: 'avaliacao' | 'anamnese' | 'pre_consulta' | 'anexo';
-  data: string;
-  titulo: string;
-  detalhe: string | null;
-  status: StatusRegistro | null;
-  origem: 'local' | 'nutrio';
-}
+/** A linha do tempo (RF-13) é compartilhada com o app; o item vem de lá. */
+export type { ItemLinhaDoTempo } from '@nutri/calculos';

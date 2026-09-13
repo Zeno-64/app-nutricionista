@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { mensagem } from '../autenticacao/Sessao';
 import { Aviso, Botao, Carregando, Cartao, Etiqueta } from '../componentes/ui';
-import { carregarPaciente, listarAnamneses, listarAvaliacoes } from '../dados/consultas';
+import {
+  carregarPaciente,
+  listarAnamneses,
+  listarAvaliacoes,
+  registrarVisualizacao,
+} from '../dados/consultas';
 import { formatarData, montarLinhaDoTempo } from '../dados/linhaDoTempo';
 import type { ItemLinhaDoTempo, Paciente as PacienteDTO } from '../dados/tipos';
 
@@ -28,6 +33,8 @@ export function Paciente() {
         setPaciente(dados);
         setItens(montarLinhaDoTempo(avaliacoes, anamneses));
         setErro(null);
+        // RNF-11: abrir a ficha é acesso a prontuário e entra na auditoria.
+        if (dados !== null) void registrarVisualizacao('pacientes', dados.id, dados.id);
       } catch (falha) {
         if (ativo) setErro(mensagem(falha));
       }

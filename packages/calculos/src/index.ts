@@ -1,5 +1,8 @@
 /**
- * @nutri/calculos — fórmulas e protocolos de avaliação nutricional.
+ * @nutri/calculos — fórmulas, protocolos e o resto do domínio que o painel e o
+ * app compartilham: a geometria do gráfico de evolução e a linha do tempo do
+ * paciente moram aqui pelo mesmo motivo que as fórmulas — são regras, não
+ * interface, e as duas telas precisam concordar.
  *
  * Regra que atravessa o pacote (RN-06): uma fórmula só calcula depois de
  * conferida na fonte primária e coberta por teste com valor de referência.
@@ -30,3 +33,5 @@ export * from './energia/meta';
 export * from './evolucao/indicadores';
 export * from './evolucao/serie';
 export * from './evolucao/grafico';
+
+export * from './paciente/linhaDoTempo';

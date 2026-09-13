@@ -8,12 +8,39 @@ export interface Perfil {
   nome: string;
 }
 
+export type GrupoPaciente =
+  | 'adulto'
+  | 'crianca_adolescente'
+  | 'gestante'
+  | 'lactante'
+  | 'atleta';
+
 export interface Paciente {
   id: string;
   nome: string;
   objetivo: string | null;
   arquivado_em: string | null;
   usuario_id: string | null;
+  origem: 'local' | 'nutrio';
+}
+
+/** A ficha traz o cadastro inteiro; a lista se contenta com o recorte acima. */
+export interface PacienteCompleto extends Paciente {
+  data_nascimento: string | null;
+  sexo: 'masculino' | 'feminino' | null;
+  telefone: string | null;
+  email: string | null;
+  profissao: string | null;
+  observacoes: string | null;
+  grupos: GrupoPaciente[];
+}
+
+export interface Anamnese {
+  id: string;
+  tipo: 'anamnese' | 'pre_consulta';
+  status: 'rascunho' | 'finalizada';
+  data_registro: string;
+  respondida_em: string | null;
   origem: 'local' | 'nutrio';
 }
 

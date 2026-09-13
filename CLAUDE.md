@@ -61,13 +61,14 @@ Requisitos v0.2 fechados. Monorepo de pé, com as quatro partes andando:
   versionamento e comparação, nova avaliação com cálculo ao vivo e memória na
   tela, evolução com gráfico e tabela comparativa, e editor de modelos de
   anamnese e pré-consulta.
-- **`apps/mobile`** — login, rota por perfil, lista de pacientes e, para o
-  paciente, as avaliações liberadas com gráfico de evolução. O gráfico usa a
-  mesma geometria do painel, calculada em `@nutri/calculos`. Roda no Expo Go
-  (`npm run mobile`) ou no navegador (`npm run mobile:navegador`); para instalar
-  no aparelho, o `eas.json` tem os perfis de build.
+- **`apps/mobile`** — login, rota por perfil, lista e busca de pacientes, ficha
+  do paciente com linha do tempo e, para o paciente, as avaliações liberadas com
+  gráfico de evolução. O gráfico e a linha do tempo usam a mesma lógica do
+  painel, em `@nutri/calculos`. Roda no Expo Go (`npm run mobile`) ou no
+  navegador (`npm run mobile:navegador`); para instalar no aparelho, o
+  `eas.json` tem os perfis de build.
 
-229 testes no workspace, mais 52 asserções no banco. Typecheck limpo nos
+232 testes no workspace, mais 52 asserções no banco. Typecheck limpo nos
 três pacotes, painel e app empacotam, console do navegador sem erro.
 
 ### Três bloqueios que dependem de fora
@@ -114,9 +115,8 @@ Pendências com o Kevin:
    dados de demonstração e as contas de teste já estão lá.
 3. **Painel:** convite do paciente para o app, anexos e fotos de evolução,
    PDF da avaliação.
-4. **App:** ficha e linha do tempo do paciente, preencher anamnese e avaliação
-   pelo celular, enviar pré-consulta e liberar avaliação, responder
-   pré-consulta.
+4. **App:** preencher anamnese e avaliação pelo celular, enviar pré-consulta e
+   liberar avaliação, responder pré-consulta.
 5. **Migração da Nutrio** (RF-80 a RF-87): tabelas de importação e relatório. As
    colunas `origem` e `origem_id` já existem nas tabelas clínicas, com índice
    único que impede duplicar numa reexecução.
