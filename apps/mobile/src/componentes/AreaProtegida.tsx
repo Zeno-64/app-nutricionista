@@ -1,10 +1,21 @@
 import { Redirect } from 'expo-router';
+import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { Carregando } from '@/componentes/ui';
 import { useSessao } from '@/sessao/Sessao';
+import type { PerfilTipo } from '@/supabase/tipos';
 
-/** RF-01: um app só nas lojas; o perfil da conta decide qual área abre. */
-export default function Inicio() {
+/**
+ * RF-01 e RN-08: cada área é de um tipo de perfil. Quem cai na área errada vai
+ * para a sua, em vez de ver uma tela vazia por falta de permissão.
+ */
+export function AreaProtegida({
+  perfilExigido,
+  children,
+}: {
+  perfilExigido: PerfilTipo;
+  children: ReactNode;
+}) {
   const { usuario, perfil, carregando } = useSessao();
 
   if (carregando) {
@@ -14,7 +25,6 @@ export default function Inicio() {
       </View>
     );
   }
-
   if (usuario === null) return <Redirect href="/entrar" />;
   if (perfil === null) {
     return (
@@ -23,6 +33,9 @@ export default function Inicio() {
       </View>
     );
   }
+  if (perfil.tipo !== perfilExigido) {
+    return <Redirect href={perfil.tipo === 'nutricionista' ? '/pacientes' : '/evolucao'} />;
+  }
 
-  return <Redirect href={perfil.tipo === 'nutricionista' ? '/pacientes' : '/evolucao'} />;
+  return <>{children}</>;
 }
