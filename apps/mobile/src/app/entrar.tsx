@@ -2,7 +2,7 @@ import { Redirect } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Aviso, Botao, Campo, Cartao, Texto, Titulo } from '@/componentes/ui';
+import { Aviso, Botao, Campo, Cartao, Texto, Titulo, Versao } from '@/componentes/ui';
 import { Cores, Espaco } from '@/constantes/tema';
 import { mensagem, useSessao } from '@/sessao/Sessao';
 import { supabaseConfigurado } from '@/supabase/cliente';
@@ -81,6 +81,8 @@ export default function Entrar() {
             <Text style={estilos.link}>Esqueci a senha</Text>
           </Pressable>
         </Cartao>
+
+        <Versao />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

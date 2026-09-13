@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import type { ReactNode } from 'react';
 import {
   ActivityIndicator,
@@ -184,6 +185,28 @@ export function Cartao({ children }: { children: ReactNode }) {
   return <View style={estilos.cartao}>{children}</View>;
 }
 
+/**
+ * Qual versão está rodando, discreta no rodapé.
+ *
+ * Não é enfeite: numa distribuição de teste o cliente relata um problema por
+ * mensagem, e é por este número que se sabe de qual build ele está falando —
+ * senão a primeira pergunta de toda conversa vira "você já atualizou?".
+ *
+ * O número entre parênteses é o do build, que o EAS incrementa sozinho a cada
+ * envio. Ele só existe no app instalado: no Expo Go e no navegador aparece só
+ * a versão do `app.json`.
+ */
+export function Versao() {
+  const versao = Constants.expoConfig?.version ?? '?';
+  const build =
+    Constants.platform?.ios?.buildNumber ?? Constants.platform?.android?.versionCode ?? null;
+  return (
+    <Text style={estilos.versao}>
+      {build === null ? `Versão ${versao}` : `Versão ${versao} (${build})`}
+    </Text>
+  );
+}
+
 const estilos = StyleSheet.create({
   titulo: { fontSize: 22, fontWeight: '600', color: Cores.texto },
   texto: { fontSize: 15, color: Cores.texto },
@@ -232,5 +255,11 @@ const estilos = StyleSheet.create({
     borderColor: Cores.borda,
     padding: Espaco.medio,
     gap: Espaco.medio,
+  },
+  versao: {
+    fontSize: 12,
+    color: Cores.textoSuave,
+    textAlign: 'center',
+    paddingVertical: Espaco.medio,
   },
 });

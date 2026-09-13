@@ -12,6 +12,7 @@
     "teste": {
       "distribution": "internal",
       "environment": "preview",
+      "autoIncrement": true,
       "android": {
         "buildType": "apk"
       },

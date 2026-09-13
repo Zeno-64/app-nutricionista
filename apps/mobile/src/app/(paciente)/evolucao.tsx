@@ -17,7 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { GraficoEvolucao } from '@/componentes/GraficoEvolucao';
-import { Aviso, Botao, Carregando, Texto, Titulo } from '@/componentes/ui';
+import { Aviso, Botao, Carregando, Texto, Titulo, Versao } from '@/componentes/ui';
 import { Cores, Espaco } from '@/constantes/tema';
 import { mensagem, useSessao } from '@/sessao/Sessao';
 import { exigirSupabase } from '@/supabase/cliente';
@@ -238,6 +238,8 @@ export default function Evolucao() {
               ))}
             </>
           )}
+
+          <Versao />
         </ScrollView>
       )}
     </SafeAreaView>

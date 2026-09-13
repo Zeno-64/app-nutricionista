@@ -2,7 +2,7 @@ import { Link } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Aviso, Botao, Campo, Carregando, Texto, Titulo } from '@/componentes/ui';
+import { Aviso, Botao, Campo, Carregando, Texto, Titulo, Versao } from '@/componentes/ui';
 import { Cores, Espaco } from '@/constantes/tema';
 import { mensagem, useSessao } from '@/sessao/Sessao';
 import { listarPacientes } from '@/supabase/consultas';
@@ -88,6 +88,7 @@ export default function Pacientes() {
               {busca === '' ? 'Nenhum paciente cadastrado ainda.' : 'Nenhum paciente com esse nome.'}
             </Text>
           }
+          ListFooterComponent={<Versao />}
           renderItem={({ item }) => (
             <Link href={`/pacientes/${item.id}`} asChild>
               <Pressable
