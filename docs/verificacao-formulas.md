@@ -23,6 +23,19 @@ Em 2026-09-12, resumos automáticos de páginas devolveram coeficientes errados:
 
 Ler o texto da fonte diretamente (HTML ou PDF) e conferir dígito por dígito.
 
+### Acesso às fontes no ambiente de nuvem
+
+Em 2026-09-13, a sessão em nuvem não consegue abrir as fontes primárias: a
+política de saída da rede recusa `www.fao.org`, `journals.plos.org` e os demais
+domínios de publicação (resposta 403 do proxy). O WebFetch também é recusado, e
+mesmo que passasse devolveria resumo gerado por modelo — exatamente o que a
+seção acima proíbe como método de conferência.
+
+Enquanto isso não se resolve, a conferência precisa ser feita em máquina com
+acesso aberto, ou o ambiente precisa liberar os domínios das publicações. Por
+isso todas as fórmulas com coeficiente continuam `pendente` ou `parcial` e o
+pacote `packages/calculos` recusa o cálculo delas.
+
 ## Status
 
 Legenda: **pendente** = ainda não conferida na fonte primária;
@@ -74,3 +87,39 @@ supra-ilíaca), fonte secundária topendsports.com:
 | Ministério da Saúde (2005) — gestante | pendente | Identificar o documento; perguntar ao nutricionista ou à Nutrio |
 | GET por fórmula de bolso | não precisa | Peso × kcal/kg informado pelo nutricionista |
 | TMB e GET manuais | não precisa | Valor informado |
+
+## Tabelas de classificação
+
+Não são equações com coeficiente ajustado, e sim faixas publicadas. O pacote
+`packages/calculos` já as aplica, porque o cálculo em si (uma razão entre
+medidas) é definição aritmética. Os pontos de corte ainda precisam ser
+conferidos no documento original.
+
+| Tabela | Status | Fonte a conferir | Onde está no código |
+|---|---|---|---|
+| Faixas de IMC para adultos | parcial | OMS, *Obesity: preventing and managing the global epidemic*, WHO Technical Report Series 894, 2000 | `antropometria/imc.ts` |
+| Ponto de corte de RCQ (0,90 homens / 0,85 mulheres) | parcial | OMS, *Waist circumference and waist–hip ratio*, 2008 | `antropometria/indices.ts` |
+| Ponto de corte de RCE (0,50 e 0,60) | parcial | Ashwell M. & Gibson S. | `antropometria/indices.ts` |
+| Escores-z infantis (IMC/idade, peso/idade, estatura/idade) | pendente | Curvas da OMS — precisa dos dados LMS de referência | ainda não implementado (RF-37) |
+
+## Fatores de atividade sugeridos
+
+A lista de 1,2 a 1,9 que aparece na interface (`energia/fatores-atividade.ts`) é
+convenção difundida, sem fonte primária identificada. Não bloqueia o cálculo
+porque o fator é dado que o nutricionista informa, e o campo aceita qualquer
+valor — mas a interface precisa deixar claro que são sugestões editáveis, e a
+fonte ainda deve ser localizada.
+
+## O que já calcula
+
+Só o que não tem coeficiente a conferir. Garantido pelo teste
+`packages/calculos/src/catalogo.test.ts`:
+
+- IMC, RCQ e RCE, com as ressalvas das tabelas de classificação acima
+- massa gorda e massa livre de gordura a partir do percentual (e o caminho
+  inverso, a partir da bioimpedância)
+- meta calórica e distribuição de macronutrientes
+- GET por fórmula de bolso, TMB manual e GET manual
+
+Todo o resto está no catálogo, aparece na interface com o status e recusa o
+cálculo com `FormulaIndisponivelError`.

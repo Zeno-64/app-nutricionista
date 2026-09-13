@@ -1,0 +1,25 @@
+{
+  "name": "@nutri/calculos",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fórmulas e protocolos de avaliação nutricional, em TypeScript puro",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cobertura": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.0"
+  }
+}

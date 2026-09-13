@@ -1,0 +1,29 @@
+{
+  "name": "app-nutricionista",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sistema para nutricionista gerenciar pacientes, anamnese e avaliações",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.19.4"
+  },
+  "scripts": {
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "calculos": "npm run test --workspace @nutri/calculos",
+    "web": "npm run dev --workspace @nutri/web",
+    "mobile": "npm run start --workspace @nutri/mobile"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3"
+  },
+  "overrides": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  }
+}
