@@ -1,0 +1,32 @@
+{
+  "name": "@nutri/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc -b --noEmit"
+  },
+  "dependencies": {
+    "@nutri/calculos": "*",
+    "@supabase/supabase-js": "^2.116.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-router": "^7.18.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "~19.2.2",
+    "@types/react-dom": "~19.2.2",
+    "@vitejs/plugin-react": "^6.1.1",
+    "jsdom": "^28.0.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.0"
+  },
+  "comentarioReactRouter": "react-router fica na linha 7 porque a 8 exige react >= 19.2.7 e o painel usa a mesma versão de React fixada pelo Expo (19.2.3), para não haver duas cópias de React no workspace."
+}
