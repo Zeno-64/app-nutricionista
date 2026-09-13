@@ -135,8 +135,13 @@ export function Aviso({
     erro: 'border-red-200 bg-red-50 text-red-900',
     informacao: 'border-sky-200 bg-sky-50 text-sky-900',
   } as const;
+  // Um <div>, não <p>: o aviso às vezes carrega uma lista de pendências, e
+  // <ul> dentro de <p> é HTML inválido — o React reclama e o navegador
+  // reorganiza a árvore por conta própria.
   return (
-    <p className={`rounded-lg border px-3 py-2 text-sm ${estilos[tom]}`}>{children}</p>
+    <div role="status" className={`rounded-lg border px-3 py-2 text-sm ${estilos[tom]}`}>
+      {children}
+    </div>
   );
 }
 
@@ -209,5 +214,37 @@ export function CaixaDeSelecao({
       />
       {rotulo}
     </label>
+  );
+}
+
+export function BotaoIcone({
+  rotulo,
+  children,
+  aoTocar,
+  desabilitado = false,
+  perigo = false,
+}: {
+  /** Texto lido por leitor de tela (RNF-08). */
+  rotulo: string;
+  children: ReactNode;
+  aoTocar: () => void;
+  desabilitado?: boolean;
+  perigo?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      title={rotulo}
+      aria-label={rotulo}
+      onClick={aoTocar}
+      disabled={desabilitado}
+      className={`rounded border border-slate-300 px-2 py-1 text-xs leading-none transition disabled:cursor-not-allowed disabled:opacity-40 ${
+        perigo
+          ? 'text-red-700 hover:border-red-300 hover:bg-red-50'
+          : 'text-slate-600 hover:bg-slate-50'
+      }`}
+    >
+      {children}
+    </button>
   );
 }

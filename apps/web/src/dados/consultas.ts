@@ -5,6 +5,8 @@ import type {
   RespostaParaCriar,
   SecaoModelo,
 } from './anamnese';
+import type { ModeloEditor } from './modelo';
+import { paraEditor, paraPayload } from './modelo';
 import type { Anamnese, Avaliacao, Membro, Paciente, Perfil, TipoFormulario } from './tipos';
 
 /** Consultas do painel. A RLS já limita as linhas ao tenant do usuário. */
@@ -304,4 +306,74 @@ export async function carregarAnamneseAnterior(
   if (error) throw error;
   if (data === null) return null;
   return carregarAnamnese((data as { id: string }).id);
+}
+
+// ---------------------------------------------------------------------------
+// Edição de modelos (RF-20, RF-27)
+// ---------------------------------------------------------------------------
+
+export interface ModeloNaLista extends ModeloResumo {
+  descricao: string | null;
+  ativo: boolean;
+  atualizado_em: string;
+  perguntas: number;
+}
+
+/** Todos os modelos do consultório, ativos e inativos, com a contagem de perguntas. */
+export async function listarTodosModelos(): Promise<ModeloNaLista[]> {
+  const { data, error } = await exigirSupabase()
+    .from('modelos_formulario')
+    .select('id, nome, tipo, padrao, descricao, ativo, atualizado_em, perguntas_modelo(count)')
+    .order('tipo')
+    .order('padrao', { ascending: false })
+    .order('nome');
+  if (error) throw error;
+
+  return (data ?? []).map((linha) => {
+    const { perguntas_modelo: contagem, ...resto } = linha as Record<string, unknown> & {
+      perguntas_modelo: Array<{ count: number }>;
+    };
+    return { ...resto, perguntas: contagem[0]?.count ?? 0 } as ModeloNaLista;
+  });
+}
+
+export async function carregarModeloCompleto(modeloId: string): Promise<ModeloEditor> {
+  const supabase = exigirSupabase();
+  const [cabecalho, estrutura] = await Promise.all([
+    supabase
+      .from('modelos_formulario')
+      .select('id, nome, descricao, tipo, ativo, padrao')
+      .eq('id', modeloId)
+      .single(),
+    carregarModelo(modeloId),
+  ]);
+  if (cabecalho.error) throw cabecalho.error;
+
+  return paraEditor(
+    cabecalho.data as Parameters<typeof paraEditor>[0],
+    estrutura.secoes,
+    estrutura.perguntas as Parameters<typeof paraEditor>[2],
+  );
+}
+
+/**
+ * Grava o modelo inteiro numa chamada só. Seção e pergunta não existem soltas:
+ * salvar pela metade deixaria o formulário quebrado, então quem monta a
+ * transação é o banco.
+ */
+export async function salvarModelo(modelo: ModeloEditor, tenantId: string): Promise<string> {
+  const { data, error } = await exigirSupabase().rpc('salvar_modelo_formulario', {
+    p_modelo: paraPayload(modelo, tenantId),
+  });
+  if (error) throw error;
+  return data as string;
+}
+
+/** RF-27: desativar em vez de apagar — modelo usado tem anamnese apontando para ele. */
+export async function definirModeloAtivo(modeloId: string, ativo: boolean): Promise<void> {
+  const { error } = await exigirSupabase()
+    .from('modelos_formulario')
+    .update({ ativo })
+    .eq('id', modeloId);
+  if (error) throw error;
 }

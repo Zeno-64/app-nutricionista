@@ -9,6 +9,8 @@ import { MinhaEvolucao } from './paginas/MinhaEvolucao';
 import { Paciente } from './paginas/Paciente';
 import { PacienteFormulario } from './paginas/PacienteFormulario';
 import { Pacientes } from './paginas/Pacientes';
+import { ModeloEditor } from './paginas/modelos/ModeloEditor';
+import { Modelos } from './paginas/modelos/Modelos';
 import { Anamnese } from './paginas/anamnese/Anamnese';
 import { NovaAnamnese } from './paginas/anamnese/NovaAnamnese';
 import { NovaAvaliacao } from './paginas/avaliacao/NovaAvaliacao';
@@ -67,6 +69,22 @@ export function App() {
               element={
                 <RotaProtegida perfilExigido="nutricionista">
                   <NovaAnamnese />
+                </RotaProtegida>
+              }
+            />
+            <Route
+              path="/modelos"
+              element={
+                <RotaProtegida perfilExigido="nutricionista">
+                  <Modelos />
+                </RotaProtegida>
+              }
+            />
+            <Route
+              path="/modelos/:id"
+              element={
+                <RotaProtegida perfilExigido="nutricionista">
+                  <ModeloEditor />
                 </RotaProtegida>
               }
             />

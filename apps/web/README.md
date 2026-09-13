@@ -43,14 +43,15 @@ que falta configurar, em vez de quebrar.
 - Nova avaliação com cálculo ao vivo e memória de cálculo (RF-30 a RF-45)
 - Evolução: gráfico por indicador e tabela comparativa entre avaliações
   (RF-50, RF-51)
+- Modelos de formulário: criar e editar anamnese e pré-consulta, com seções,
+  sete tipos de pergunta, alternativas e pergunta condicional (RF-20, RF-22,
+  RF-27)
 - Área do paciente com as avaliações liberadas (RF-62)
 
 ## O que falta
 
 - Convite do paciente para o app (RF-02): precisa de função de servidor, porque
   o convite por e-mail usa a chave de service role
-- Criação e edição de modelos de formulário (RF-20, RF-27) — hoje só existe o
-  modelo padrão criado pela função do banco
 - Anexos e fotos de evolução (RF-14, RF-15)
 - PDF da avaliação (RF-52)
 - Migração da Nutrio (RF-80 a RF-87)

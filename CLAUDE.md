@@ -58,12 +58,13 @@ Requisitos v0.2 fechados. Monorepo de pé, com as quatro partes andando:
 - **`apps/web`** — login, rota por perfil, lista de pacientes, cadastro e edição
   com validação, arquivamento, linha do tempo, anamnese e pré-consulta com
   versionamento e comparação, nova avaliação com cálculo ao vivo e memória na
-  tela, e evolução com gráfico e tabela comparativa.
+  tela, evolução com gráfico e tabela comparativa, e editor de modelos de
+  anamnese e pré-consulta.
 - **`apps/mobile`** — login, rota por perfil, lista de pacientes e, para o
   paciente, as avaliações liberadas com gráfico de evolução. O gráfico usa a
   mesma geometria do painel, calculada em `@nutri/calculos`.
 
-206 testes no workspace, mais 32 asserções de RLS no banco. Typecheck limpo nos
+229 testes no workspace, mais 52 asserções no banco. Typecheck limpo nos
 três pacotes, painel e app empacotam, console do navegador sem erro.
 
 ### Três bloqueios que dependem de fora
@@ -105,8 +106,8 @@ Pendências com o Kevin:
 2. **Exercitar painel e app ponta a ponta** contra o projeto de
    desenvolvimento, numa máquina cuja rede alcance o Supabase. O esquema, os
    dados de demonstração e as contas de teste já estão lá.
-3. **Painel:** convite do paciente para o app, criação e edição de modelos de
-   formulário, anexos e fotos de evolução, PDF da avaliação.
+3. **Painel:** convite do paciente para o app, anexos e fotos de evolução,
+   PDF da avaliação.
 4. **App:** ficha e linha do tempo do paciente, preencher anamnese e avaliação
    pelo celular, enviar pré-consulta e liberar avaliação, responder
    pré-consulta.

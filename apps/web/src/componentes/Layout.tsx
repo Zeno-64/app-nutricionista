@@ -18,9 +18,14 @@ export function Layout() {
               Nutri
             </Link>
             {ehNutricionista && (
-              <Link to="/pacientes" className="text-sm text-slate-600 hover:text-slate-900">
-                Pacientes
-              </Link>
+              <>
+                <Link to="/pacientes" className="text-sm text-slate-600 hover:text-slate-900">
+                  Pacientes
+                </Link>
+                <Link to="/modelos" className="text-sm text-slate-600 hover:text-slate-900">
+                  Modelos
+                </Link>
+              </>
             )}
           </nav>
           <div className="flex items-center gap-3">

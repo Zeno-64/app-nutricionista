@@ -80,6 +80,7 @@ cada papel precisa.
 | `..._auditoria.sql` | Trilha de quem criou, alterou, apagou e visualizou |
 | `..._modelo_padrao_anamnese.sql` | Questionário atual do nutricionista (§4.4) |
 | `..._permissoes.sql` | Revoga o atalho de privilégio e concede o mínimo a `authenticated` |
+| `..._salvar_modelo_formulario.sql` | Grava o modelo, suas seções e perguntas numa transação, preservando o id das perguntas |
 
 ## Regras garantidas no banco
 
@@ -102,6 +103,9 @@ Não dependem de a aplicação lembrar de aplicá-las:
   GET, e exige o fator na que resulta em TMB.
 - **RNF-11** — gatilho grava criação, alteração e exclusão na auditoria; a
   visualização entra por `registrar_visualizacao`.
+- **RF-26** — editar um modelo não desliga a anamnese já preenchida:
+  `salvar_modelo_formulario` atualiza a pergunta em vez de recriá-la, então o
+  `pergunta_id` que a resposta guarda continua valendo.
 
 ## Segurança conferida
 
