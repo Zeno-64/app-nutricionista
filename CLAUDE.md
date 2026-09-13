@@ -52,12 +52,14 @@ Requisitos v0.2 fechados. Monorepo de pé, com as quatro partes andando:
   formulário, anamneses, avaliações, anexos, consentimentos e auditoria, com
   RLS, trava de imutabilidade, versionamento e testes. Detalhes em
   `supabase/README.md`.
-- **`apps/web`** — login, rota por perfil, lista de pacientes, linha do tempo e
-  nova avaliação com cálculo ao vivo e memória na tela.
+- **`apps/web`** — login, rota por perfil, lista de pacientes, cadastro e edição
+  com validação, arquivamento, linha do tempo, anamnese e pré-consulta com
+  versionamento e comparação, e nova avaliação com cálculo ao vivo e memória na
+  tela.
 - **`apps/mobile`** — login, rota por perfil, lista de pacientes e avaliações
   liberadas.
 
-134 testes no workspace, mais 32 asserções de RLS no banco. Typecheck limpo nos
+185 testes no workspace, mais 32 asserções de RLS no banco. Typecheck limpo nos
 três pacotes, painel e app empacotam, console do navegador sem erro.
 
 ### Três bloqueios que dependem de fora
@@ -75,6 +77,14 @@ três pacotes, painel e app empacotam, console do navegador sem erro.
 3. **Sem credenciais de projeto Supabase,** nem o painel nem o app foram
    testados ponta a ponta. Os dois sobem e dizem o que falta no `.env`.
 
+   O projeto `Zeno-64's Project` (ref `igsbxhvoqqpuioajpfpi`, `sa-east-1`,
+   Postgres 17) foi inspecionado em 2026-09-13 e está **completamente vazio**:
+   nenhuma tabela em `public`, nenhum usuário, nenhum bucket, nenhuma migration.
+   Serve para desenvolvimento. Ele estava pausado e foi religado para essa
+   conferência, então **está ligado agora** — pausar de novo é no painel do
+   Supabase. As migrations não chegaram a ser aplicadas: o acesso ao Supabase
+   caiu no meio da sessão.
+
 Pendências com o Kevin:
 - Prints do questionário de pré-consulta atual.
 - Confirmar se a lista de fórmulas dos prints está completa.
@@ -90,10 +100,13 @@ Pendências com o Kevin:
    coeficientes em `docs/verificacao-formulas.md`, implementar o `calcular`,
    escrever o teste com o valor de referência e só então virar o status. Siri
    vem primeiro: sem ela, nenhum protocolo de densidade calcula.
-2. **Projeto Supabase de desenvolvimento:** criar, aplicar as migrations, pôr as
-   chaves no `.env` e exercitar painel e app ponta a ponta.
-3. **Painel:** cadastro e edição de paciente, arquivamento, convite, anamnese e
-   pré-consulta, anexos, gráficos de evolução e tabela comparativa.
+2. **Projeto Supabase de desenvolvimento:** aplicar as 12 migrations no projeto
+   vazio já existente (`supabase link` e `supabase db push`, ou pelo editor SQL
+   na ordem dos arquivos), pôr URL e chave anônima no `.env` e exercitar painel
+   e app ponta a ponta. Depois, criar o primeiro tenant, o membro proprietário e
+   o modelo padrão com `criar_modelo_padrao_anamnese`.
+3. **Painel:** convite do paciente para o app, criação e edição de modelos de
+   formulário, anexos, gráficos de evolução e tabela comparativa.
 4. **App:** ficha e linha do tempo do paciente, preencher anamnese e avaliação
    pelo celular, enviar pré-consulta e liberar avaliação, responder
    pré-consulta.

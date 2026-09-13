@@ -54,10 +54,25 @@ export function Paciente() {
             {paciente.objetivo !== null && ` · ${paciente.objetivo}`}
           </p>
         </div>
-        <Link to={`/pacientes/${paciente.id}/avaliacoes/nova`}>
-          <Botao>Nova avaliação</Botao>
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link to={`/pacientes/${paciente.id}/editar`}>
+            <Botao variante="secundario">Editar cadastro</Botao>
+          </Link>
+          <Link to={`/pacientes/${paciente.id}/anamneses/nova?tipo=pre_consulta`}>
+            <Botao variante="secundario">Enviar pré-consulta</Botao>
+          </Link>
+          <Link to={`/pacientes/${paciente.id}/anamneses/nova`}>
+            <Botao variante="secundario">Nova anamnese</Botao>
+          </Link>
+          <Link to={`/pacientes/${paciente.id}/avaliacoes/nova`}>
+            <Botao>Nova avaliação</Botao>
+          </Link>
+        </div>
       </header>
+
+      {paciente.arquivado_em !== null && (
+        <Aviso>Paciente arquivado. O histórico continua aqui, mas ele perde o acesso ao app.</Aviso>
+      )}
 
       {paciente.grupos.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -83,7 +98,13 @@ export function Paciente() {
                 </time>
                 <div className="flex-1 border-l border-slate-200 pb-1 pl-4">
                   <p className="flex flex-wrap items-center gap-2 text-sm font-medium text-slate-900">
-                    {item.titulo}
+                    {item.tipo === 'anamnese' || item.tipo === 'pre_consulta' ? (
+                      <Link to={`/anamneses/${item.id}`} className="hover:underline">
+                        {item.titulo}
+                      </Link>
+                    ) : (
+                      item.titulo
+                    )}
                     {item.status === 'rascunho' && <Etiqueta tom="ambar">Rascunho</Etiqueta>}
                     {item.origem === 'nutrio' && <Etiqueta tom="roxo">Nutrio</Etiqueta>}
                   </p>

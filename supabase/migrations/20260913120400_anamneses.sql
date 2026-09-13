@@ -83,6 +83,9 @@ create table public.respostas_anamnese (
   secao_titulo text,
   enunciado text not null,
   tipo public.tipo_pergunta not null,
+  -- Alternativas oferecidas, copiadas junto com o enunciado: a anamnese
+  -- finalizada precisa preservar as opções que existiam na hora (RN-02).
+  opcoes jsonb,
   -- Resposta em jsonb para caber qualquer tipo de pergunta. Nulo = sem resposta.
   valor jsonb,
 
@@ -173,9 +176,9 @@ begin
   returning id into v_nova_id;
 
   insert into public.respostas_anamnese (
-    tenant_id, anamnese_id, pergunta_id, ordem, secao_titulo, enunciado, tipo, valor
+    tenant_id, anamnese_id, pergunta_id, ordem, secao_titulo, enunciado, tipo, opcoes, valor
   )
-  select tenant_id, v_nova_id, pergunta_id, ordem, secao_titulo, enunciado, tipo, valor
+  select tenant_id, v_nova_id, pergunta_id, ordem, secao_titulo, enunciado, tipo, opcoes, valor
   from public.respostas_anamnese
   where anamnese_id = p_anamnese;
 

@@ -6,7 +6,10 @@ import { Carregando } from './componentes/ui.js';
 import { Entrar } from './paginas/Entrar.js';
 import { MinhaEvolucao } from './paginas/MinhaEvolucao.js';
 import { Paciente } from './paginas/Paciente.js';
+import { PacienteFormulario } from './paginas/PacienteFormulario.js';
 import { Pacientes } from './paginas/Pacientes.js';
+import { Anamnese } from './paginas/anamnese/Anamnese.js';
+import { NovaAnamnese } from './paginas/anamnese/NovaAnamnese.js';
 import { NovaAvaliacao } from './paginas/avaliacao/NovaAvaliacao.js';
 
 export function App() {
@@ -27,10 +30,42 @@ export function App() {
               }
             />
             <Route
+              path="/pacientes/novo"
+              element={
+                <RotaProtegida perfilExigido="nutricionista">
+                  <PacienteFormulario />
+                </RotaProtegida>
+              }
+            />
+            <Route
               path="/pacientes/:id"
               element={
                 <RotaProtegida perfilExigido="nutricionista">
                   <Paciente />
+                </RotaProtegida>
+              }
+            />
+            <Route
+              path="/pacientes/:id/editar"
+              element={
+                <RotaProtegida perfilExigido="nutricionista">
+                  <PacienteFormulario />
+                </RotaProtegida>
+              }
+            />
+            <Route
+              path="/pacientes/:id/anamneses/nova"
+              element={
+                <RotaProtegida perfilExigido="nutricionista">
+                  <NovaAnamnese />
+                </RotaProtegida>
+              }
+            />
+            <Route
+              path="/anamneses/:id"
+              element={
+                <RotaProtegida perfilExigido="nutricionista">
+                  <Anamnese />
                 </RotaProtegida>
               }
             />

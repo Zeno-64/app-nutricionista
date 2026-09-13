@@ -30,14 +30,22 @@ que falta configurar, em vez de quebrar.
 - Login com e-mail e senha e recuperação de senha (RF-01)
 - Rota por perfil: nutricionista e paciente não se misturam (RN-08)
 - Lista de pacientes com busca e filtro de arquivados (RF-11)
+- Cadastro e edição de paciente, com validação de CPF, data e grupos, e
+  arquivamento (RF-10, RF-12, RF-16)
 - Linha do tempo do paciente (RF-13)
+- Anamnese e pré-consulta: criação a partir do modelo pulando as perguntas que
+  não se aplicam, preenchimento, finalização, nova versão e comparação com a
+  anterior (RF-20 a RF-26)
 - Nova avaliação com cálculo ao vivo e memória de cálculo (RF-30 a RF-45)
 - Área do paciente com as avaliações liberadas (RF-62)
 
 ## O que falta
 
-- Cadastro e edição de paciente (RF-10), arquivamento (RF-12) e convite (RF-02)
-- Anamnese e pré-consulta: preenchimento, versões e comparação (RF-20 a RF-27)
+- Convite do paciente para o app (RF-02): precisa de função de servidor, porque
+  o convite por e-mail usa a chave de service role
+- Criação e edição de modelos de formulário (RF-20, RF-27) — hoje só existe o
+  modelo padrão criado pela função do banco
 - Anexos e fotos de evolução (RF-14, RF-15)
 - Gráficos de evolução e tabela comparativa (RF-50, RF-51)
+- PDF da avaliação (RF-52)
 - Migração da Nutrio (RF-80 a RF-87)

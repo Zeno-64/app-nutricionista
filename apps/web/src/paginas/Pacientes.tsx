@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { mensagem } from '../autenticacao/Sessao.js';
-import { Aviso, Campo, Carregando, Cartao, Etiqueta } from '../componentes/ui.js';
+import { Aviso, Botao, Campo, Carregando, Cartao, Etiqueta } from '../componentes/ui.js';
 import { listarPacientes } from '../dados/consultas.js';
 import { formatarData } from '../dados/linhaDoTempo.js';
 import type { Paciente } from '../dados/tipos.js';
@@ -38,7 +38,12 @@ export function Pacientes() {
   return (
     <div className="space-y-4">
       <header className="flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-xl font-semibold text-slate-900">Pacientes</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl font-semibold text-slate-900">Pacientes</h1>
+          <Link to="/pacientes/novo">
+            <Botao>Novo paciente</Botao>
+          </Link>
+        </div>
         <div className="flex items-end gap-3">
           <div className="w-64">
             <Campo rotulo="Buscar por nome" valor={busca} aoMudar={setBusca} placeholder="Nome do paciente" />

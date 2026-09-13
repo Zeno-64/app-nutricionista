@@ -9,6 +9,14 @@ import type { FormulaEnergiaId, ProtocoloId, Sexo } from '@nutri/calculos';
 export type PerfilTipo = 'nutricionista' | 'paciente';
 export type StatusRegistro = 'rascunho' | 'finalizada';
 export type TipoFormulario = 'anamnese' | 'pre_consulta';
+export type TipoPergunta =
+  | 'texto_longo'
+  | 'texto_curto'
+  | 'numero'
+  | 'sim_nao'
+  | 'multipla_escolha'
+  | 'escala_0_10'
+  | 'data';
 export type GrupoPaciente =
   | 'adulto'
   | 'crianca_adolescente'
@@ -39,7 +47,9 @@ export interface Paciente {
   nome: string;
   data_nascimento: string | null;
   sexo: Sexo | null;
+  cpf: string | null;
   email: string | null;
+  profissao: string | null;
   telefone: string | null;
   objetivo: string | null;
   observacoes: string | null;
@@ -88,6 +98,8 @@ export interface Anamnese {
   data_registro: string;
   enviada_em: string | null;
   respondida_em: string | null;
+  liberada_em: string | null;
+  substituida_por_id: string | null;
   finalizada_em: string | null;
   origem: 'local' | 'nutrio';
 }

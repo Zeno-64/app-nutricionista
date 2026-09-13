@@ -43,6 +43,8 @@ function anamnese(ajustes: Partial<Anamnese>): Anamnese {
     data_registro: '2026-08-01',
     enviada_em: null,
     respondida_em: null,
+    liberada_em: null,
+    substituida_por_id: null,
     finalizada_em: null,
     origem: 'local',
     ...ajustes,
