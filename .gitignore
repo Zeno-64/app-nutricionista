@@ -10,3 +10,4 @@ web-build
 .DS_Store
 supabase/.temp
 supabase/.branches
+*.tsbuildinfo
