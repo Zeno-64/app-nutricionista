@@ -6,7 +6,8 @@ própria evolução. O nutricionista usa hoje a Nutrio e vai migrar de lá.
 
 Requisitos completos em [docs/requisitos.md](docs/requisitos.md) — ler antes de
 implementar. Status das fórmulas em
-[docs/verificacao-formulas.md](docs/verificacao-formulas.md).
+[docs/verificacao-formulas.md](docs/verificacao-formulas.md). Como rodar e
+instalar o app em [docs/testar-o-app.md](docs/testar-o-app.md).
 
 ## Decisões tomadas
 
@@ -62,7 +63,9 @@ Requisitos v0.2 fechados. Monorepo de pé, com as quatro partes andando:
   anamnese e pré-consulta.
 - **`apps/mobile`** — login, rota por perfil, lista de pacientes e, para o
   paciente, as avaliações liberadas com gráfico de evolução. O gráfico usa a
-  mesma geometria do painel, calculada em `@nutri/calculos`.
+  mesma geometria do painel, calculada em `@nutri/calculos`. Roda no Expo Go
+  (`npm run mobile`) ou no navegador (`npm run mobile:navegador`); para instalar
+  no aparelho, o `eas.json` tem os perfis de build.
 
 229 testes no workspace, mais 52 asserções no banco. Typecheck limpo nos
 três pacotes, painel e app empacotam, console do navegador sem erro.
@@ -82,9 +85,10 @@ três pacotes, painel e app empacotam, console do navegador sem erro.
 3. **A rede da sessão em nuvem recusa `*.supabase.co`,** então o navegador
    daqui não alcança o projeto. O painel e o app não puderam ser exercitados
    ponta a ponta a partir deste ambiente — na máquina do Kevin funcionam com
-   `npm run web`. As telas foram conferidas rodando o painel de verdade e
-   interceptando as respostas HTTP com os mesmos dados do banco —
-   `apps/web/testes/telas.mjs` faz isso e serve para repetir a conferência.
+   `npm run web`. As telas foram conferidas rodando o painel e o app de verdade
+   e interceptando as respostas HTTP com os mesmos dados do banco:
+   `npm run telas:painel` e `npm run telas:app` repetem a conferência. O que
+   some nessa troca é a RLS, testada no banco.
 
    **O esquema está aplicado no projeto de desenvolvimento** desde 2026-09-13,
    com dados de demonstração e contas de teste — ver `supabase/README.md`.

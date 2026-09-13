@@ -1,4 +1,4 @@
-import { chromium } from 'playwright';
+import { abrirChromium } from '../../../testes/navegador.mjs';
 
 const DIR = process.env.SAIDA ?? new URL('./telas', import.meta.url).pathname;
 const BASE = 'http://127.0.0.1:4180';
@@ -149,7 +149,7 @@ function corpo(url, aceitaObjeto) {
   return aceitaObjeto ? (dados[0] ?? null) : dados;
 }
 
-const navegador = await chromium.launch();
+const navegador = await abrirChromium();
 const pagina = await navegador.newPage({ viewport: { width: 1440, height: 1000 } });
 const problemas = [];
 pagina.on('console', (m) => { if (m.type() === 'error') problemas.push(m.text()); });

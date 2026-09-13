@@ -4,8 +4,13 @@ React Native com Expo (expo-router). Um app só nas lojas, com duas áreas: o
 login define qual abre (RF-01).
 
 ```sh
-npm run start --workspace @nutri/mobile
+npm run mobile              # QR Code para abrir no Expo Go, no celular
+npm run mobile:navegador    # o mesmo app no navegador, sem celular
 ```
+
+Para instalar de verdade no aparelho, ou publicar, veja
+[docs/testar-o-app.md](../../docs/testar-o-app.md) — os perfis de build do EAS
+estão em `eas.json`.
 
 Precisa de `EXPO_PUBLIC_SUPABASE_URL` e `EXPO_PUBLIC_SUPABASE_ANON_KEY` no
 `.env` da raiz (ver `.env.example`). Sem essas variáveis o app abre e diz o que
@@ -39,6 +44,13 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 - **O `expo-env.d.ts` é gerado pelo script de typecheck** quando não existe. O
   Expo só o cria no primeiro `expo start`, e sem ele o `tsc` quebra em clone
   novo.
+- **`web.output` é `single`, não `static`.** O `static` pré-renderiza cada rota
+  no Node, e o cliente do Supabase lê a sessão do armazenamento assim que sobe —
+  no Node não existe `window`, e o empacotamento para web quebrava inteiro. Num
+  app inteiro autenticado não há o que pré-renderizar.
+- **`/entrar` redireciona quem já tem sessão.** O `index.tsx` é quem sabe qual
+  área abrir para cada perfil; a tela de login só o chama de volta. Sem isso o
+  login dava certo e a tela não mudava.
 
 ## O que falta
 
@@ -50,3 +62,7 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 - Rascunho local enquanto não sincroniza (RNF-07)
 - Nome do app e identificador nas lojas: ainda pendente com o Kevin. O `app.json`
   está com `Nutri` / `app-nutricionista` / `appnutricionista` como provisórios.
+- Limpar o que sobrou do template: `@expo/ui`, `expo-glass-effect`,
+  `expo-symbols`, `expo-image`, `expo-device`, `expo-font` e `expo-web-browser`
+  estão nas dependências e não são usados por nenhuma tela. Ícone e splash
+  também ainda são os do template.

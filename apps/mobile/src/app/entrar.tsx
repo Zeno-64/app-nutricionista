@@ -1,3 +1,4 @@
+import { Redirect } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,7 +9,7 @@ import { supabaseConfigurado } from '@/supabase/cliente';
 
 /** RF-01: login com e-mail e senha, com recuperação de senha. */
 export default function Entrar() {
-  const { entrar, recuperarSenha } = useSessao();
+  const { usuario, entrar, recuperarSenha } = useSessao();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState<string | null>(null);
@@ -41,6 +42,11 @@ export default function Entrar() {
       setErro(mensagem(falha));
     }
   }
+
+  // Quem já tem sessão não fica na tela de login: volta para a raiz, que é
+  // quem sabe qual área abrir para o perfil (RF-01). Sem isto, entrar dá certo
+  // e a tela continua a mesma — inclusive ao reabrir o app já logado.
+  if (usuario !== null) return <Redirect href="/" />;
 
   return (
     <SafeAreaView style={estilos.tela}>

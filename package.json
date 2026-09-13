@@ -18,6 +18,9 @@
     "calculos": "npm run test --workspace @nutri/calculos",
     "web": "npm run dev --workspace @nutri/web",
     "mobile": "npm run start --workspace @nutri/mobile",
+    "mobile:navegador": "npm run web --workspace @nutri/mobile",
+    "telas:app": "node apps/mobile/testes/telas.mjs",
+    "telas:painel": "node apps/web/testes/telas.mjs",
     "db:teste": "./supabase/testes/recriar.sh",
     "db:esquema": "./supabase/testes/recriar.sh --sem-testes"
   },
