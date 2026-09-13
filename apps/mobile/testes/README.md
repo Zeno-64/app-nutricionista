@@ -42,9 +42,11 @@ testada no banco, em `supabase/testes/`, e não aqui.
 
 As telas que gravam são exercitadas de verdade: o roteiro toca no botão,
 confirma e olha o que o app *tentou* escrever — que a liberação manda
-`liberada_em`, que a pré-consulta sai com `enviada_em` preenchido e que só as
-perguntas que se aplicam àquele paciente foram copiadas (RF-22). É o mais perto
-que dá de um teste de integração sem banco.
+`liberada_em`, que a pré-consulta sai com `enviada_em` preenchido, que só as
+perguntas que se aplicam àquele paciente foram copiadas (RF-22), que cada tipo
+de resposta chega no formato certo (texto, número, booleano, nota) e que o
+envio final passa por `finalizar_pre_consulta`, não por um `update` direto. É o
+mais perto que dá de um teste de integração sem banco.
 
 ## Três defeitos que ele já pegou
 

@@ -90,6 +90,7 @@ percentual de gordura, e cinco dos oito dependem disso.
 | RF-01 | Login e rota por perfil |
 | RF-55 | Lista, busca, ficha do paciente e linha do tempo |
 | RF-57 | Enviar pré-consulta e liberar ou esconder avaliação |
+| RF-61 | Paciente responde a pré-consulta, com gravação a cada campo |
 | RF-62 | Avaliações liberadas com gráfico de evolução |
 
 Roda no Expo Go, no navegador e, com o `eas.json`, como app instalado — ver
@@ -118,8 +119,7 @@ não passa por essa conferência é justamente a RLS, que é testada no banco.
 
 | ID | O quê | Por quê agora |
 |---|---|---|
-| RF-61 | Responder a pré-consulta pelo app | O nutricionista já consegue enviar; ninguém consegue responder |
-| RF-02 | Convite do paciente para o app | Precisa de função de servidor: o convite por e-mail usa a chave de service role, que não pode ir para o app nem para o painel |
+| RF-02 | Convite do paciente para o app | Precisa de função de servidor: o convite por e-mail usa a chave de service role, que não pode ir para o app nem para o painel. **É o que falta para o ciclo fechar de verdade** — hoje o paciente de demonstração já existe, mas não há como criar um novo |
 | RF-03 | Aceite do termo de consentimento no primeiro acesso | A tabela existe, a tela não. É LGPD, não é opcional |
 | RF-60 | Paciente vê o próprio perfil e o do nutricionista | Fecha a área do paciente |
 

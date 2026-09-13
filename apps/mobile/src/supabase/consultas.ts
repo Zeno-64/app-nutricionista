@@ -3,10 +3,17 @@ import {
   montarRespostas,
   type AnamneseDaLinhaDoTempo,
   type PerguntaModelo,
+  type RespostaAnamnese,
   type SecaoModelo,
 } from '@nutri/calculos';
 import { exigirSupabase } from './cliente';
-import type { AvaliacaoDaFicha, Paciente, PacienteCompleto } from './tipos';
+import type {
+  AvaliacaoDaFicha,
+  Paciente,
+  PacienteCompleto,
+  PreConsulta,
+  PreConsultaResumo,
+} from './tipos';
 
 const COLUNAS_PACIENTE =
   'id, nome, objetivo, arquivado_em, usuario_id, origem, data_nascimento, sexo, telefone, email, profissao, observacoes, grupos';
@@ -159,6 +166,76 @@ export async function enviarPreConsulta(parametros: {
   }
 
   return anamneseId;
+}
+
+// ---------------------------------------------------------------------------
+// Área do paciente (RF-61)
+// ---------------------------------------------------------------------------
+
+const COLUNAS_RESPOSTA =
+  'id, anamnese_id, pergunta_id, ordem, secao_titulo, enunciado, tipo, opcoes, valor';
+
+/**
+ * As pré-consultas que o paciente ainda precisa responder.
+ *
+ * A consulta não filtra por paciente: a RLS devolve só as dele, e só as que
+ * foram enviadas (RN-03). Repetir o filtro aqui daria a impressão errada de
+ * que a regra mora na tela.
+ */
+export async function listarPreConsultasPendentes(): Promise<PreConsultaResumo[]> {
+  const { data, error } = await exigirSupabase()
+    .from('anamneses')
+    .select('id, data_registro, enviada_em')
+    .eq('tipo', 'pre_consulta')
+    .eq('status', 'rascunho')
+    .order('enviada_em', { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as PreConsultaResumo[];
+}
+
+export async function carregarPreConsulta(
+  id: string,
+): Promise<{ anamnese: PreConsulta; respostas: RespostaAnamnese[] }> {
+  const supabase = exigirSupabase();
+  const [cabecalho, respostas] = await Promise.all([
+    supabase
+      .from('anamneses')
+      .select('id, tipo, status, data_registro, enviada_em, respondida_em')
+      .eq('id', id)
+      .maybeSingle(),
+    supabase
+      .from('respostas_anamnese')
+      .select(COLUNAS_RESPOSTA)
+      .eq('anamnese_id', id)
+      .order('ordem'),
+  ]);
+  if (cabecalho.error) throw cabecalho.error;
+  if (respostas.error) throw respostas.error;
+  if (cabecalho.data === null) throw new Error('Pré-consulta não encontrada.');
+
+  return {
+    anamnese: cabecalho.data as PreConsulta,
+    respostas: (respostas.data ?? []) as unknown as RespostaAnamnese[],
+  };
+}
+
+export async function salvarResposta(id: string, valor: unknown): Promise<void> {
+  const { error } = await exigirSupabase()
+    .from('respostas_anamnese')
+    .update({ valor })
+    .eq('id', id);
+  if (error) throw error;
+}
+
+/**
+ * RF-61: o paciente encerra a pré-consulta pela função do banco, não por um
+ * `update` na tabela — ele nunca ganha permissão de alterar a anamnese em si.
+ */
+export async function finalizarPreConsulta(id: string): Promise<void> {
+  const { error } = await exigirSupabase().rpc('finalizar_pre_consulta', {
+    p_anamnese: id,
+  });
+  if (error) throw error;
 }
 
 /**

@@ -77,12 +77,25 @@ const perguntasDoModelo = [
   { id: 'p4', secao_id: 's1', ordem: 4, enunciado: 'Treinou quantas vezes?', tipo: 'numero', opcoes: null, obrigatoria: false, condicao: { campo: 'grupo', igual: 'atleta' } },
 ];
 
+const PRE_CONSULTA = 'ffffffff-ffff-4fff-8fff-000000000002';
+
+// As respostas em branco que o paciente vai preencher, uma de cada tipo que a
+// tela desenha diferente.
+const respostasDaPreConsulta = [
+  { id: 'r1', anamnese_id: PRE_CONSULTA, pergunta_id: 'p1', ordem: 1, secao_titulo: 'Antes da consulta', enunciado: 'Como foi a semana?', tipo: 'texto_longo', opcoes: null, valor: null },
+  { id: 'r2', anamnese_id: PRE_CONSULTA, pergunta_id: 'p2', ordem: 2, secao_titulo: 'Antes da consulta', enunciado: 'Peso de hoje', tipo: 'numero', opcoes: null, valor: null },
+  { id: 'r3', anamnese_id: PRE_CONSULTA, pergunta_id: 'p5', ordem: 3, secao_titulo: 'Antes da consulta', enunciado: 'Treinou esta semana?', tipo: 'sim_nao', opcoes: null, valor: null },
+  { id: 'r4', anamnese_id: PRE_CONSULTA, pergunta_id: 'p6', ordem: 4, secao_titulo: 'Antes da consulta', enunciado: 'Qualidade do sono, de 0 a 10', tipo: 'escala_0_10', opcoes: null, valor: null },
+  { id: 'r5', anamnese_id: PRE_CONSULTA, pergunta_id: 'p7', ordem: 5, secao_titulo: 'Antes da consulta', enunciado: 'Como está o intestino?', tipo: 'multipla_escolha', opcoes: ['Normal', 'Preso', 'Solto'], valor: null },
+];
+
 const anamneses = [
   {
-    id: 'ffffffff-ffff-4fff-8fff-000000000002',
+    id: PRE_CONSULTA,
     tipo: 'pre_consulta',
     status: 'rascunho',
     data_registro: '2026-09-13',
+    enviada_em: '2026-09-13T12:00:00Z',
     respondida_em: null,
     origem: 'local',
   },
@@ -240,7 +253,10 @@ await pagina.route(`${SUPABASE}/**`, (rota) => {
   const tabela = url.pathname.replace('/rest/v1/', '');
   const objeto = (req.headers()['accept'] ?? '').includes('pgrst.object');
 
-  if (tabela.startsWith('rpc/')) return json(null);
+  if (tabela.startsWith('rpc/')) {
+    gravacoes.push({ metodo: 'RPC', tabela, corpo: req.postDataJSON() });
+    return json(null);
+  }
 
   // Guarda o que o app tentou escrever, para o roteiro conferir no fim. Só
   // depois da autenticação: o login também é um POST.
@@ -264,7 +280,16 @@ await pagina.route(`${SUPABASE}/**`, (rota) => {
   } else if (tabela === 'avaliacoes') {
     dados = avaliacoes;
   } else if (tabela === 'anamneses') {
-    dados = anamneses;
+    // Honra os `eq` da consulta: sem isso a lista de pendências do paciente
+    // receberia também a anamnese finalizada, e o roteiro veria duas.
+    dados = anamneses.filter((a) =>
+      ['id', 'tipo', 'status'].every((coluna) => {
+        const filtro = url.searchParams.get(coluna);
+        return filtro === null || a[coluna] === filtro.replace(/^eq\./, '');
+      }),
+    );
+  } else if (tabela === 'respostas_anamnese') {
+    dados = respostasDaPreConsulta;
   } else if (tabela === 'membros') {
     dados = quemEntrou === 'nutri@demo.test' ? [membro] : [];
   } else if (tabela === 'modelos_formulario') {
@@ -357,6 +382,36 @@ console.log('  rota após entrar como paciente:', new URL(pagina.url()).pathname
 await print('07-evolucao');
 await pagina.getByText('Gordura corporal', { exact: true }).click();
 await print('08-evolucao-gordura');
+
+// 5. RF-61: o paciente responde a pré-consulta
+await pagina.getByText('Pré-consulta para responder', { exact: true }).click();
+await pagina.waitForTimeout(1300);
+console.log('  rota da pré-consulta:', new URL(pagina.url()).pathname);
+
+const antesDeResponder = gravacoes.length;
+await pagina.locator('textarea').first().fill('Semana corrida, mas consegui treinar.');
+await pagina.locator('input').first().fill('67,8');
+await pagina.locator('input').first().blur();
+await pagina.waitForTimeout(400);
+await pagina.getByText('Sim', { exact: true }).click();
+await pagina.getByText('7', { exact: true }).click();
+await pagina.getByText('Preso', { exact: true }).click();
+await pagina.waitForTimeout(600);
+await print('09-pre-consulta');
+
+const gravadas = gravacoes
+  .slice(antesDeResponder)
+  .filter((g) => g.tabela === 'respostas_anamnese');
+console.log('  respostas gravadas:', gravadas.map((g) => JSON.stringify(g.corpo.valor)).join(', '));
+
+await pagina.getByText('Enviar respostas', { exact: true }).click();
+await pagina.waitForTimeout(400);
+await print('10-confirmar-envio');
+await pagina.getByText('Enviar', { exact: true }).click();
+await pagina.waitForTimeout(1200);
+
+const finalizou = gravacoes.find((g) => g.tabela === 'rpc/finalizar_pre_consulta');
+console.log('  finalizou pela função do banco:', finalizou === undefined ? 'NÃO' : 'sim');
 
 console.log(
   '\nErros no console:',

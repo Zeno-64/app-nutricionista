@@ -53,6 +53,19 @@ export interface Membro {
   ativo: boolean;
 }
 
+/** O que a lista de pendências do paciente precisa saber (RF-61). */
+export interface PreConsultaResumo {
+  id: string;
+  data_registro: string;
+  enviada_em: string | null;
+}
+
+export interface PreConsulta extends PreConsultaResumo {
+  tipo: 'anamnese' | 'pre_consulta';
+  status: 'rascunho' | 'finalizada';
+  respondida_em: string | null;
+}
+
 export interface Anamnese {
   id: string;
   tipo: 'anamnese' | 'pre_consulta';

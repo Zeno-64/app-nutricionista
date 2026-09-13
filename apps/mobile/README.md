@@ -25,6 +25,7 @@ falta na tela de login, em vez de quebrar.
 | `/pacientes` | Nutricionista — lista e busca |
 | `/pacientes/[id]` | Nutricionista — ficha, linha do tempo e as ações da RF-57 |
 | `/evolucao` | Paciente — avaliações liberadas e gráfico de evolução |
+| `/pre-consultas/[id]` | Paciente — responder a pré-consulta que recebeu |
 
 As duas áreas ficam em grupos (`(nutricionista)` e `(paciente)`), cada um com um
 layout que confere o perfil e manda embora quem entrou na área errada.
@@ -55,6 +56,17 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 - **A sessão carrega o vínculo (`membros`) junto do perfil.** É de lá que sai o
   `tenant_id` de qualquer gravação do nutricionista. O paciente não tem linha
   em `membros`, e a consulta volta vazia sem erro.
+- **A pré-consulta grava cada resposta ao sair do campo,** não só no fim. O
+  questionário é longo e o app pode ir para segundo plano no meio; perder o que
+  já foi digitado seria o pior jeito de estrear com o paciente. O envio final
+  é só a chamada de `finalizar_pre_consulta`.
+- **Quem encerra a pré-consulta é a função do banco.** O paciente nunca ganha
+  `update` em `anamneses` — só em `respostas_anamnese`, e só enquanto a
+  pré-consulta está em rascunho. A trava é da RLS, não da tela.
+- **Escolha em fichas, não no seletor nativo.** Com três a onze opções, a ficha
+  mostra tudo de uma vez e responde a um toque; num formulário longo, um
+  seletor que abre e fecha a cada pergunta cansa. E o componente nativo do
+  `@expo/ui` não aparece no navegador, onde as telas são conferidas.
 - **Imports relativos sem extensão:** o Metro não resolve o `.js` que o
   TypeScript aceita, e isso quebrava o bundle assim que o app passou a
   importar o pacote de cálculos.
@@ -71,7 +83,11 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 
 ## O que falta
 
-- Preencher anamnese e avaliação pelo celular (RF-56)
+- Preencher anamnese e avaliação pelo celular (RF-56). Atenção a um ponto que
+  já existe no painel: a resposta de pergunta numérica é gravada como texto
+  (`"67,8"`), do jeito que foi digitada. Serve para a pré-consulta, onde ninguém
+  calcula em cima; a avaliação vai precisar de número de verdade.
+- Ver o próprio perfil e o do nutricionista (RF-60)
 - Responder pré-consulta, do lado do paciente (RF-61)
 - Notificação push (RF-63) e login por biometria (RF-06)
 - Rascunho local enquanto não sincroniza (RNF-07)
