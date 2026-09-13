@@ -5,9 +5,9 @@ pacientes, anamnese e avaliações, com um app em que o paciente acompanha a
 própria evolução. O nutricionista usa hoje a Nutrio e vai migrar de lá.
 
 Requisitos completos em [docs/requisitos.md](docs/requisitos.md) — ler antes de
-implementar. Status das fórmulas em
-[docs/verificacao-formulas.md](docs/verificacao-formulas.md). Como rodar e
-instalar o app em [docs/testar-o-app.md](docs/testar-o-app.md).
+implementar. Andamento em [docs/roadmap.md](docs/roadmap.md). Status das
+fórmulas em [docs/verificacao-formulas.md](docs/verificacao-formulas.md). Como
+rodar e instalar o app em [docs/testar-o-app.md](docs/testar-o-app.md).
 
 ## Decisões tomadas
 
