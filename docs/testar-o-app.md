@@ -94,17 +94,43 @@ repositório nem para a nuvem. Sem isso o build termina bem e o app abre dizendo
 que falta configurar o Supabase.
 
 ```sh
-eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_URL --value "https://igsbxhvoqqpuioajpfpi.supabase.co"
-eas env:create --environment preview --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "<a chave anônima, do .env>"
+eas env:set --environment preview --visibility plaintext \
+  --name EXPO_PUBLIC_SUPABASE_URL --value "https://igsbxhvoqqpuioajpfpi.supabase.co"
+eas env:set --environment preview --visibility sensitive \
+  --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "<a chave anônima, do .env>"
 ```
 
 O perfil `teste` do `eas.json` aponta para o ambiente `preview`, então é de lá
 que ele lê. `eas env:list --environment preview` confere o que ficou gravado.
 
-**3. Ligue o repositório do GitHub** ao projeto, no painel da Expo (*Project
-settings → GitHub*). Não é obrigatório para buildar da sua máquina, mas é o que
-permite disparar um build sem ela — inclusive de uma sessão do Claude Code, que
-alcança a API da Expo mas não tem como fazer `eas login`.
+A visibilidade só decide quem enxerga o valor no painel e nos registros da
+Expo: qualquer `EXPO_PUBLIC_*` acaba dentro do pacote do app, que é legível por
+quem instalar. É por isso que a chave anônima pode ir aí — quem protege os
+dados é a RLS, não o segredo da chave. Nenhuma chave de service role entra
+neste caminho.
+
+Dá para fazer o mesmo pelo painel, em *Project settings → Environment
+variables*. O item **Environment variables** que aparece na barra lateral da
+conta é outra coisa: vale para todos os projetos da conta, e se mistura com os
+do projeto na hora do build.
+
+**3. Ligue o repositório do GitHub** ao projeto. Não é obrigatório para buildar
+da sua máquina, mas é o que permite disparar um build sem ela — inclusive de uma
+sessão do Claude Code, que alcança a API da Expo mas não tem como fazer
+`eas login`. A Expo pede quatro coisas:
+
+- sua conta do GitHub ligada à da Expo, em *Account settings → Overview → User
+  settings → Connections*;
+- o app do GitHub da Expo instalado na sua conta do GitHub (ele pede a
+  permissão na hora);
+- o repositório ligado ao projeto, em *Project settings → GitHub*, com a **base
+  directory** valendo `apps/mobile` — sem isso ele procura o app na raiz do
+  monorepo e não acha;
+- **um build que já tenha dado certo da sua máquina**, para cada plataforma. É
+  pré-requisito da Expo, não capricho: o build pelo GitHub não é o primeiro.
+
+O `image: "latest"` que o `eas.json` já traz nos perfis também é exigência
+desse caminho.
 
 ### A cada versão
 
