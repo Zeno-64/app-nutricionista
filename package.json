@@ -17,7 +17,9 @@
     "lint": "npm run lint --workspaces --if-present",
     "calculos": "npm run test --workspace @nutri/calculos",
     "web": "npm run dev --workspace @nutri/web",
-    "mobile": "npm run start --workspace @nutri/mobile"
+    "mobile": "npm run start --workspace @nutri/mobile",
+    "db:teste": "./supabase/testes/recriar.sh",
+    "db:esquema": "./supabase/testes/recriar.sh --sem-testes"
   },
   "devDependencies": {
     "typescript": "~6.0.3"
