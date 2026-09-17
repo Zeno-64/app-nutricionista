@@ -9,8 +9,8 @@ Atualizado em 2026-09-13.
 
 O alicerce está pronto: banco com as regras clínicas garantidas por gatilho e
 RLS, catálogo completo de fórmulas, painel web cobrindo o atendimento inteiro e
-app com as duas áreas de pé. 232 testes no workspace, 52 asserções no banco,
-12 migrations.
+app com as duas áreas de pé. 232 testes no workspace, 62 asserções no banco,
+13 migrations.
 
 O que falta se divide em três grupos, e vale entender a diferença:
 
@@ -50,11 +50,12 @@ percentual de gordura, e cinco dos oito dependem disso.
 
 | O quê | Onde |
 |---|---|
-| Tenants, membros, perfis, pacientes | 12 migrations, esquema aplicado no projeto de desenvolvimento |
+| Tenants, membros, perfis, pacientes | 13 migrations, esquema aplicado no projeto de desenvolvimento |
 | Modelos de formulário, anamneses, avaliações, anexos, consentimentos | idem |
 | RN-01 — `tenant_id` e RLS em toda tabela clínica | teste varre o catálogo do Postgres |
 | RN-02 — gatilho recusa alterar registro finalizado; correção gera nova versão | `nova_versao_avaliacao`, `nova_versao_anamnese` |
 | RN-03, RN-04, RN-08 | políticas e gatilho |
+| RF-60 — o paciente vê quem cuida dele sem abrir `perfis`, `membros` e `tenants` | `meu_nutricionista()` |
 | RF-41 — `check` recusa fator de atividade em fórmula que já dá GET | dupla trava: banco e TypeScript |
 | RNF-11 — auditoria de criação, alteração, exclusão e visualização | gatilho + `registrar_visualizacao` |
 | Questionário atual da anamnese (§4.4) como modelo padrão | migration de dados |
@@ -90,6 +91,7 @@ percentual de gordura, e cinco dos oito dependem disso.
 | RF-01 | Login e rota por perfil |
 | RF-55 | Lista, busca, ficha do paciente e linha do tempo |
 | RF-57 | Enviar pré-consulta e liberar ou esconder avaliação |
+| RF-60 | Paciente vê o próprio cadastro, quem cuida dele e o contato do consultório |
 | RF-61 | Paciente responde a pré-consulta, com gravação a cada campo |
 | RF-62 | Avaliações liberadas com gráfico de evolução |
 
@@ -126,7 +128,6 @@ não passa por essa conferência é justamente a RLS, que é testada no banco.
 |---|---|---|
 | RF-02 | Convite do paciente para o app | Precisa de função de servidor: o convite por e-mail usa a chave de service role, que não pode ir para o app nem para o painel. **É o que falta para o ciclo fechar de verdade** — hoje o paciente de demonstração já existe, mas não há como criar um novo |
 | RF-03 | Aceite do termo de consentimento no primeiro acesso | A tabela existe, a tela não. É LGPD, não é opcional |
-| RF-60 | Paciente vê o próprio perfil e o do nutricionista | Fecha a área do paciente |
 
 ### 4. Completar o atendimento
 

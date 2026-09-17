@@ -9,6 +9,8 @@ import {
 import { exigirSupabase } from './cliente';
 import type {
   AvaliacaoDaFicha,
+  MeuCadastro,
+  Nutricionista,
   Paciente,
   PacienteCompleto,
   PreConsulta,
@@ -236,6 +238,39 @@ export async function finalizarPreConsulta(id: string): Promise<void> {
     p_anamnese: id,
   });
   if (error) throw error;
+}
+
+// Sem `observacoes`: ver o comentário de `MeuCadastro`.
+const COLUNAS_MEU_CADASTRO =
+  'id, nome, objetivo, arquivado_em, usuario_id, origem, data_nascimento, sexo, telefone, email, profissao, grupos';
+
+/**
+ * RF-60: o cadastro do próprio paciente.
+ *
+ * Sem filtro por usuário, pelo mesmo motivo das outras consultas do paciente:
+ * a RLS devolve só a linha dele. O `maybeSingle` é seguro porque um usuário
+ * tem no máximo um paciente — o índice `pacientes_usuario_unico` garante.
+ */
+export async function carregarMeuCadastro(): Promise<MeuCadastro | null> {
+  const { data, error } = await exigirSupabase()
+    .from('pacientes')
+    .select(COLUNAS_MEU_CADASTRO)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as MeuCadastro | null) ?? null;
+}
+
+/**
+ * RF-60: quem atende o paciente e como falar com o consultório.
+ *
+ * Vem de uma função do banco porque a RLS fecha `perfis`, `membros` e
+ * `tenants` para o paciente, e assim continua: a função escolhe as colunas no
+ * servidor em vez de abrir as três tabelas.
+ */
+export async function carregarMeuNutricionista(): Promise<Nutricionista[]> {
+  const { data, error } = await exigirSupabase().rpc('meu_nutricionista');
+  if (error) throw error;
+  return (data ?? []) as Nutricionista[];
 }
 
 /**

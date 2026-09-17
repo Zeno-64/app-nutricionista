@@ -25,6 +25,7 @@ falta na tela de login, em vez de quebrar.
 | `/pacientes` | Nutricionista — lista e busca |
 | `/pacientes/[id]` | Nutricionista — ficha, linha do tempo e as ações da RF-57 |
 | `/evolucao` | Paciente — avaliações liberadas e gráfico de evolução |
+| `/perfil` | Paciente — o próprio cadastro e quem cuida dele |
 | `/pre-consultas/[id]` | Paciente — responder a pré-consulta que recebeu |
 
 As duas áreas ficam em grupos (`(nutricionista)` e `(paciente)`), cada um com um
@@ -56,6 +57,15 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 - **A sessão carrega o vínculo (`membros`) junto do perfil.** É de lá que sai o
   `tenant_id` de qualquer gravação do nutricionista. O paciente não tem linha
   em `membros`, e a consulta volta vazia sem erro.
+- **Quem o paciente vê do outro lado quem monta é o banco.** A RLS fecha
+  `perfis`, `membros` e `tenants` para ele — e continua fechando: a tela de
+  perfil chama `meu_nutricionista()`, uma função que escolhe as colunas no
+  servidor. Abrir as três tabelas seriam três políticas novas, e a de `perfis`
+  passaria a deixar um usuário ler a linha de outro.
+- **O perfil do paciente é só leitura,** e a tela diz isso. Ele não tem
+  política de `update` em `pacientes`: quem mantém o cadastro é o
+  nutricionista. Mostrar um campo que o banco recusaria seria pior do que a
+  frase.
 - **A pré-consulta grava cada resposta ao sair do campo,** não só no fim. O
   questionário é longo e o app pode ir para segundo plano no meio; perder o que
   já foi digitado seria o pior jeito de estrear com o paciente. O envio final
@@ -95,7 +105,6 @@ layout que confere o perfil e manda embora quem entrou na área errada.
   já existe no painel: a resposta de pergunta numérica é gravada como texto
   (`"67,8"`), do jeito que foi digitada. Serve para a pré-consulta, onde ninguém
   calcula em cima; a avaliação vai precisar de número de verdade.
-- Ver o próprio perfil e o do nutricionista (RF-60)
 - Notificação push (RF-63) e login por biometria (RF-06)
 - Rascunho local enquanto não sincroniza (RNF-07)
 - Nome do app e identificador nas lojas: ainda pendente com o Kevin. O `app.json`

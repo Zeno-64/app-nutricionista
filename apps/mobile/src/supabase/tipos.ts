@@ -45,11 +45,38 @@ export interface AvaliacaoDaFicha extends AvaliacaoDaLinhaDoTempo {
   liberada_em: string | null;
 }
 
+/** O enum `papel_membro` das migrations. `secretaria` não atende paciente. */
+export type PapelMembro = 'proprietario' | 'nutricionista' | 'secretaria';
+
+/**
+ * O cadastro do próprio paciente, como ele se vê (RF-60).
+ *
+ * Fora `observacoes`: ali o nutricionista anota o que pensa do caso, e isso é
+ * prontuário, não "meus dados". A coluna nem é pedida na consulta.
+ */
+export type MeuCadastro = Omit<PacienteCompleto, 'observacoes'>;
+
+/**
+ * Uma linha de `meu_nutricionista()`: quem atende o paciente, com o contato do
+ * consultório junto. Quem monta isso é o banco, porque a RLS não deixa o
+ * paciente ler `perfis`, `membros` nem `tenants` de ninguém.
+ */
+export interface Nutricionista {
+  profissional_nome: string;
+  profissional_telefone: string | null;
+  crn: string | null;
+  papel: PapelMembro;
+  consultorio_nome: string;
+  consultorio_email: string | null;
+  consultorio_telefone: string | null;
+  logo_caminho: string | null;
+}
+
 /** Vínculo do nutricionista com o consultório. É de lá que sai o `tenant_id`. */
 export interface Membro {
   id: string;
   tenant_id: string;
-  papel: 'proprietario' | 'colaborador';
+  papel: PapelMembro;
   ativo: boolean;
 }
 

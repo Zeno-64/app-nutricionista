@@ -17,7 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { GraficoEvolucao } from '@/componentes/GraficoEvolucao';
-import { Aviso, Botao, Carregando, Texto, Titulo, Versao } from '@/componentes/ui';
+import { Aviso, Botao, Carregando, Titulo, Versao } from '@/componentes/ui';
 import { Cores, Espaco } from '@/constantes/tema';
 import { mensagem, useSessao } from '@/sessao/Sessao';
 import { exigirSupabase } from '@/supabase/cliente';
@@ -119,7 +119,19 @@ export default function Evolucao() {
             </Botao>
           </View>
         </View>
-        {perfil !== null && <Texto suave>{perfil.nome}</Texto>}
+        {/* RF-60: é por aqui que se chega ao próprio cadastro e ao contato do
+            nutricionista. O nome já estava na tela; virar link é o caminho mais
+            curto, sem disputar espaço com o botão de sair. */}
+        <Link href="/perfil" asChild>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Ver meus dados e meu nutricionista"
+            style={({ pressed }) => [estilos.linhaPerfil, pressed && estilos.chamadaTocada]}
+          >
+            <Text style={estilos.nomeDoPerfil}>{perfil?.nome ?? 'Meu perfil'}</Text>
+            <Text style={estilos.irParaPerfil}>Meu perfil ›</Text>
+          </Pressable>
+        </Link>
       </View>
 
       {avaliacoes === null ? (
@@ -294,6 +306,16 @@ const estilos = StyleSheet.create({
   cabecalho: { padding: Espaco.medio, gap: Espaco.pequeno },
   linhaCabecalho: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   botaoSair: { minWidth: 84 },
+  linhaPerfil: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Espaco.pequeno,
+    // Alvo de toque confortável sem virar um botão dentro do cabeçalho.
+    paddingVertical: 6,
+  },
+  nomeDoPerfil: { fontSize: 14, color: Cores.textoSuave, flexShrink: 1 },
+  irParaPerfil: { fontSize: 14, color: Cores.primaria, fontWeight: '500' },
   conteudo: { paddingHorizontal: Espaco.medio, paddingBottom: Espaco.grande, gap: Espaco.pequeno },
   cartao: {
     backgroundColor: Cores.cartao,

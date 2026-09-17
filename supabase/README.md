@@ -106,6 +106,12 @@ Não dependem de a aplicação lembrar de aplicá-las:
 - **RN-04** — paciente arquivado deixa de enxergar qualquer coisa pelo app,
   sem que nada saia do histórico.
 - **RN-08** — gatilho recusa a troca do tipo de perfil da conta.
+- **RF-60** — o paciente vê quem cuida dele por `meu_nutricionista()`, e não
+  por política nova em `perfis`, `membros` e `tenants`. Seriam três políticas,
+  cada uma um caminho a mais para vazar linha de outro consultório, e a de
+  `perfis` passaria a deixar um usuário ler a linha de outro. A função escolhe
+  as colunas no servidor, deixa a secretaria de fora e não devolve nada a
+  paciente arquivado.
 - **RF-41** — `check` recusa fator de atividade em fórmula que já resulta em
   GET, e exige o fator na que resulta em TMB.
 - **RNF-11** — gatilho grava criação, alteração e exclusão na auditoria; a

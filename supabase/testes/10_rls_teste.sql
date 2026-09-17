@@ -64,19 +64,22 @@ insert into auth.users (id, email) values
   ('cccccccc-cccc-4ccc-8ccc-000000000001', 'paciente.a@exemplo.test'),
   ('cccccccc-cccc-4ccc-8ccc-000000000002', 'paciente.arquivado@exemplo.test');
 
-insert into public.perfis (id, tipo, nome) values
-  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000001', 'nutricionista', 'Nutri A'),
-  ('bbbbbbbb-bbbb-4bbb-8bbb-000000000001', 'nutricionista', 'Nutri B'),
-  ('cccccccc-cccc-4ccc-8ccc-000000000001', 'paciente', 'Paciente A'),
-  ('cccccccc-cccc-4ccc-8ccc-000000000002', 'paciente', 'Paciente arquivado');
+insert into public.perfis (id, tipo, nome, telefone) values
+  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000001', 'nutricionista', 'Nutri A', '(11) 98888-0001'),
+  ('bbbbbbbb-bbbb-4bbb-8bbb-000000000001', 'nutricionista', 'Nutri B', null),
+  ('cccccccc-cccc-4ccc-8ccc-000000000001', 'paciente', 'Paciente A', null),
+  ('cccccccc-cccc-4ccc-8ccc-000000000002', 'paciente', 'Paciente arquivado', null);
 
-insert into public.tenants (id, nome) values
-  ('11111111-1111-4111-8111-000000000001', 'Consultório A'),
-  ('22222222-2222-4222-8222-000000000001', 'Consultório B');
+insert into public.tenants (id, nome, contato_email, contato_telefone) values
+  ('11111111-1111-4111-8111-000000000001', 'Consultório A',
+   'contato@consultorio-a.test', '(11) 3333-0001'),
+  ('22222222-2222-4222-8222-000000000001', 'Consultório B', null, null);
 
-insert into public.membros (tenant_id, usuario_id, papel) values
-  ('11111111-1111-4111-8111-000000000001', 'aaaaaaaa-aaaa-4aaa-8aaa-000000000001', 'proprietario'),
-  ('22222222-2222-4222-8222-000000000001', 'bbbbbbbb-bbbb-4bbb-8bbb-000000000001', 'proprietario');
+insert into public.membros (tenant_id, usuario_id, papel, crn) values
+  ('11111111-1111-4111-8111-000000000001', 'aaaaaaaa-aaaa-4aaa-8aaa-000000000001',
+   'proprietario', 'CRN-3 12345'),
+  ('22222222-2222-4222-8222-000000000001', 'bbbbbbbb-bbbb-4bbb-8bbb-000000000001',
+   'proprietario', 'CRN-3 67890');
 
 insert into public.pacientes (id, tenant_id, usuario_id, nome, sexo, data_nascimento) values
   ('dddddddd-dddd-4ddd-8ddd-000000000001', '11111111-1111-4111-8111-000000000001',
@@ -498,6 +501,107 @@ begin
     (select count(*) from public.perguntas_modelo
       where modelo_id = v_modelo and condicao is not null) = 1,
     'só a pergunta de ciclo menstrual é condicional'
+  );
+end;
+$$;
+
+select teste.sair();
+
+-- ---------------------------------------------------------------------------
+-- RF-60: o paciente vê quem cuida dele, e só isso
+-- ---------------------------------------------------------------------------
+
+select teste.entrar('cccccccc-cccc-4ccc-8ccc-000000000001');
+
+do $$
+declare
+  v_linha record;
+begin
+  perform teste.ok(
+    (select count(*) from public.meu_nutricionista()) = 1,
+    'o paciente vê um profissional'
+  );
+
+  select * into v_linha from public.meu_nutricionista();
+
+  perform teste.ok(v_linha.profissional_nome = 'Nutri A', 'vem o nome do nutricionista');
+  perform teste.ok(v_linha.crn = 'CRN-3 12345', 'vem o CRN (RF-05)');
+  perform teste.ok(
+    v_linha.profissional_telefone = '(11) 98888-0001',
+    'vem o telefone do nutricionista'
+  );
+  perform teste.ok(v_linha.consultorio_nome = 'Consultório A', 'vem o consultório');
+  perform teste.ok(
+    v_linha.consultorio_email = 'contato@consultorio-a.test',
+    'vem o contato do consultório'
+  );
+
+  -- A função é a única porta: as tabelas de origem continuam fechadas para ele.
+  perform teste.ok(
+    (select count(*) from public.tenants) = 0,
+    'o paciente não lê a tabela de consultórios'
+  );
+  perform teste.ok(
+    (select count(*) from public.membros) = 0,
+    'o paciente não lê a tabela de vínculos'
+  );
+  perform teste.ok(
+    (select count(*) from public.perfis) = 1,
+    'o paciente continua lendo só o próprio perfil'
+  );
+end;
+$$;
+
+select teste.sair();
+
+-- RN-04: arquivado perde o acesso, inclusive a isto.
+select teste.entrar('cccccccc-cccc-4ccc-8ccc-000000000002');
+
+select teste.ok(
+  (select count(*) from public.meu_nutricionista()) = 0,
+  'paciente arquivado não vê o nutricionista (RN-04)'
+);
+
+select teste.sair();
+
+-- Quem não é paciente de ninguém não recebe nada.
+select teste.entrar('aaaaaaaa-aaaa-4aaa-8aaa-000000000001');
+
+select teste.ok(
+  (select count(*) from public.meu_nutricionista()) = 0,
+  'o nutricionista não é paciente de ninguém e não recebe linha'
+);
+
+select teste.sair();
+
+-- Clínica com mais gente: o paciente vê quem atende, proprietário primeiro, e
+-- a secretária fica de fora. É o caso que a função documenta, porque
+-- `pacientes` não guarda quem é o profissional responsável.
+insert into auth.users (id, email) values
+  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000002', 'nutri.a2@exemplo.test'),
+  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000003', 'secretaria.a@exemplo.test');
+
+insert into public.perfis (id, tipo, nome) values
+  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000002', 'nutricionista', 'Ana Segunda'),
+  ('aaaaaaaa-aaaa-4aaa-8aaa-000000000003', 'nutricionista', 'Sandra Recepção');
+
+insert into public.membros (tenant_id, usuario_id, papel, crn) values
+  ('11111111-1111-4111-8111-000000000001',
+   'aaaaaaaa-aaaa-4aaa-8aaa-000000000002', 'nutricionista', 'CRN-3 54321'),
+  ('11111111-1111-4111-8111-000000000001',
+   'aaaaaaaa-aaaa-4aaa-8aaa-000000000003', 'secretaria', null);
+
+select teste.entrar('cccccccc-cccc-4ccc-8ccc-000000000001');
+
+do $$
+declare
+  v_nomes text[];
+begin
+  select array_agg(profissional_nome) into v_nomes from public.meu_nutricionista();
+
+  perform teste.ok(
+    v_nomes = array['Nutri A', 'Ana Segunda'],
+    'vem quem atende, proprietário primeiro, sem a secretária e sem o consultório B'
   );
 end;
 $$;

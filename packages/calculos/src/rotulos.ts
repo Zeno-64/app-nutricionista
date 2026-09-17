@@ -1,4 +1,10 @@
-import type { Circunferencia, DobraCutanea, Sexo, StatusVerificacao } from './tipos';
+import type {
+  Circunferencia,
+  DobraCutanea,
+  GrupoPaciente,
+  Sexo,
+  StatusVerificacao,
+} from './tipos';
 
 export const ROTULOS_DOBRA: Readonly<Record<DobraCutanea, string>> = {
   peitoral: 'Peitoral',
@@ -25,6 +31,14 @@ export const ROTULOS_CIRCUNFERENCIA: Readonly<Record<Circunferencia, string>> = 
 export const ROTULOS_SEXO: Readonly<Record<Sexo, string>> = {
   masculino: 'Masculino',
   feminino: 'Feminino',
+};
+
+export const ROTULOS_GRUPO: Readonly<Record<GrupoPaciente, string>> = {
+  adulto: 'Adulto',
+  crianca_adolescente: 'Criança ou adolescente',
+  gestante: 'Gestante',
+  lactante: 'Lactante',
+  atleta: 'Atleta',
 };
 
 /** Texto curto de status, para o aviso ao lado da fórmula na interface. */

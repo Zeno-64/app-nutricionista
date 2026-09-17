@@ -8,6 +8,7 @@ import {
   listarAvaliacoes,
   registrarVisualizacao,
 } from '../dados/consultas';
+import { ROTULOS_GRUPO } from '../dados/paciente';
 import { formatarData, montarLinhaDoTempo } from '../dados/linhaDoTempo';
 import type { ItemLinhaDoTempo, Paciente as PacienteDTO } from '../dados/tipos';
 
@@ -88,7 +89,7 @@ export function Paciente() {
         <div className="flex flex-wrap gap-2">
           {paciente.grupos.map((grupo) => (
             <Etiqueta key={grupo} tom="verde">
-              {rotuloGrupo(grupo)}
+              {ROTULOS_GRUPO[grupo]}
             </Etiqueta>
           ))}
         </div>
@@ -131,13 +132,3 @@ export function Paciente() {
   );
 }
 
-function rotuloGrupo(grupo: string): string {
-  const rotulos: Record<string, string> = {
-    adulto: 'Adulto',
-    crianca_adolescente: 'Criança ou adolescente',
-    gestante: 'Gestante',
-    lactante: 'Lactante',
-    atleta: 'Atleta',
-  };
-  return rotulos[grupo] ?? grupo;
-}

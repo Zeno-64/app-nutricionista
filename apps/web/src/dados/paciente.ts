@@ -33,13 +33,10 @@ export const FORMULARIO_PACIENTE_VAZIO: FormularioPaciente = {
   grupos: [],
 };
 
-export const ROTULOS_GRUPO: Readonly<Record<GrupoPaciente, string>> = {
-  adulto: 'Adulto',
-  crianca_adolescente: 'Criança ou adolescente',
-  gestante: 'Gestante',
-  lactante: 'Lactante',
-  atleta: 'Atleta',
-};
+// Os rótulos dos grupos moram em `@nutri/calculos`, junto do tipo, porque o app
+// do paciente também os mostra. Reexportados para não mexer em quem já importa
+// daqui.
+export { ROTULOS_GRUPO } from '@nutri/calculos';
 
 /** Erros por campo, para a tela marcar cada um no lugar certo. */
 export type ErrosPaciente = Partial<Record<keyof FormularioPaciente, string>>;

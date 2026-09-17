@@ -65,6 +65,22 @@ const pacientes = [
 
 const membro = { id: 'm1', tenant_id: TENANT, papel: 'proprietario', ativo: true };
 
+// O que `meu_nutricionista()` devolve ao paciente (RF-60). No banco isso é uma
+// função SECURITY DEFINER, porque a RLS fecha `perfis`, `membros` e `tenants`
+// para ele; aqui é só a resposta dela.
+const meuNutricionista = [
+  {
+    profissional_nome: 'Ana Ribeiro',
+    profissional_telefone: '(11) 98888-0001',
+    crn: 'CRN-3 12345',
+    papel: 'proprietario',
+    consultorio_nome: 'Consultório Ana Ribeiro',
+    consultorio_email: 'contato@anaribeiro.test',
+    consultorio_telefone: '(11) 3333-0001',
+    logo_caminho: null,
+  },
+];
+
 const modeloPreConsulta = { id: 'mod-pre', nome: 'Pré-consulta padrão', padrao: true };
 const secoesDoModelo = [{ id: 's1', ordem: 1, titulo: 'Antes da consulta' }];
 
@@ -207,6 +223,8 @@ pagina.on('pageerror', (e) => problemas.push(e.message));
 
 let quemEntrou = null;
 const gravacoes = [];
+/** As colunas que a tela de perfil pediu do próprio cadastro (RF-60). */
+let selectDoMeuCadastro = null;
 
 const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
 
@@ -254,6 +272,11 @@ await pagina.route(`${SUPABASE}/**`, (rota) => {
   const objeto = (req.headers()['accept'] ?? '').includes('pgrst.object');
 
   if (tabela.startsWith('rpc/')) {
+    // Função de leitura: responde com dados e não entra nas gravações, que são
+    // o que o roteiro confere no fim.
+    if (tabela === 'rpc/meu_nutricionista') {
+      return json(perfis[quemEntrou]?.tipo === 'paciente' ? meuNutricionista : []);
+    }
     gravacoes.push({ metodo: 'RPC', tabela, corpo: req.postDataJSON() });
     return json(null);
   }
@@ -269,13 +292,22 @@ await pagina.route(`${SUPABASE}/**`, (rota) => {
   if (tabela === 'perfis') {
     dados = [perfis[quemEntrou]];
   } else if (tabela === 'pacientes') {
+    // Quem enxerga quem é a RLS: o nutricionista vê os do consultório, o
+    // paciente só a própria linha. A tela do paciente não repete esse filtro,
+    // de propósito — então sem imitá-lo aqui ela mostraria o primeiro da lista.
+    const conta = perfis[quemEntrou];
+    const visiveis =
+      conta?.tipo === 'paciente' ? pacientes.filter((p) => p.usuario_id === conta.id) : pacientes;
+
+    if (conta?.tipo === 'paciente') selectDoMeuCadastro = url.searchParams.get('select');
+
     const porId = url.searchParams.get('id');
     if (porId !== null) {
-      dados = pacientes.filter((p) => p.id === porId.replace(/^eq\./, ''));
+      dados = visiveis.filter((p) => p.id === porId.replace(/^eq\./, ''));
     } else {
-      // A RLS é do banco; aqui só imita o `ilike` da busca, que é o que a tela faz.
+      // Aqui só imita o `ilike` da busca, que é o que a tela faz.
       const termo = (url.searchParams.get('nome') ?? '').replace(/^ilike\.%|%$/g, '').toLowerCase();
-      dados = pacientes.filter((p) => p.nome.toLowerCase().includes(termo));
+      dados = visiveis.filter((p) => p.nome.toLowerCase().includes(termo));
     }
   } else if (tabela === 'avaliacoes') {
     dados = avaliacoes;
@@ -412,6 +444,34 @@ await pagina.waitForTimeout(1200);
 
 const finalizou = gravacoes.find((g) => g.tabela === 'rpc/finalizar_pre_consulta');
 console.log('  finalizou pela função do banco:', finalizou === undefined ? 'NÃO' : 'sim');
+
+// 6. RF-60: o paciente vê o próprio cadastro e quem cuida dele
+await pagina.goto(`${BASE}/evolucao`, { waitUntil: 'networkidle' });
+await pagina.getByText('Meu perfil ›', { exact: true }).click();
+await pagina.waitForTimeout(1300);
+console.log('  rota do perfil:', new URL(pagina.url()).pathname);
+await print('11-perfil');
+
+const conteudoDoPerfil = await pagina.locator('body').innerText();
+const mostra = (texto) => (conteudoDoPerfil.includes(texto) ? 'sim' : 'NÃO');
+console.log(
+  '  mostra os próprios dados:',
+  `nome=${mostra('Marina Costa')}, nascimento=${mostra('18/04/1992')}, profissão=${mostra('Analista de sistemas')}`,
+);
+console.log(
+  '  mostra quem atende:',
+  `nome=${mostra('Ana Ribeiro')}, CRN=${mostra('CRN-3 12345')}, consultório=${mostra('(11) 3333-0001')}`,
+);
+// As observações são o que o nutricionista anota sobre o caso: nem a tela
+// mostra, nem a consulta pede.
+console.log(
+  '  não pede nem mostra as observações do prontuário:',
+  selectDoMeuCadastro !== null &&
+    !selectDoMeuCadastro.includes('observacoes') &&
+    !conteudoDoPerfil.includes('sono irregular')
+    ? 'sim'
+    : 'NÃO',
+);
 
 console.log(
   '\nErros no console:',
