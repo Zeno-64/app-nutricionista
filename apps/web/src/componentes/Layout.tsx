@@ -25,6 +25,9 @@ export function Layout() {
                 <Link to="/modelos" className="text-sm text-slate-600 hover:text-slate-900">
                   Modelos
                 </Link>
+                <Link to="/meus-dados" className="text-sm text-slate-600 hover:text-slate-900">
+                  Meus dados
+                </Link>
               </>
             )}
           </nav>

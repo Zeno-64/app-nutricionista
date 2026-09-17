@@ -126,6 +126,15 @@ const respostas = enunciados.map(([enunciado, valor], i) => ({
 
 const modelos = [{ id: 'mod1', nome: 'Anamnese padrão', tipo: 'anamnese', padrao: true }];
 
+// RF-05: o consultório, que é o que vai no documento e na tela do paciente.
+const consultorio = {
+  id: TENANT, nome: 'Consultório Ana Ribeiro',
+  contato_email: 'contato@anaribeiro.test', contato_telefone: '(11) 3333-0001',
+};
+
+/** O que o painel tentou gravar, para o roteiro conferir no fim. */
+const gravacoes = [];
+
 function corpo(url, aceitaObjeto) {
   const u = new URL(url);
   const caminho = u.pathname.replace('/rest/v1/', '');
@@ -144,6 +153,7 @@ function corpo(url, aceitaObjeto) {
       break;
     case 'respostas_anamnese': dados = respostas; break;
     case 'modelos_formulario': dados = tipo === 'pre_consulta' ? [] : modelos; break;
+    case 'tenants': dados = [consultorio]; break;
     default: dados = [];
   }
   return aceitaObjeto ? (dados[0] ?? null) : dados;
@@ -165,6 +175,8 @@ await pagina.route('**/rest/v1/**', (rota) => {
   const req = rota.request();
   const aceitaObjeto = (req.headers()['accept'] ?? '').includes('pgrst.object');
   if (req.method() !== 'GET') {
+    const tabela = new URL(req.url()).pathname.replace('/rest/v1/', '');
+    gravacoes.push({ metodo: req.method(), tabela, corpo: req.postDataJSON() });
     return rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(aceitaObjeto ? {} : []) });
   }
   rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(corpo(req.url(), aceitaObjeto)) });
@@ -215,6 +227,28 @@ await tela('09-nova-avaliacao', `/pacientes/${PACIENTE}/avaliacoes/nova`, async 
   await campo('Gordura (%)').fill('30');
   await pagina.waitForTimeout(500);
 });
+
+// RF-05: os dados profissionais, que alimentam o documento e a tela do paciente
+await tela('10-meus-dados', '/meus-dados', async () => {
+  await pagina.getByRole('textbox', { name: 'CRN' }).fill('CRN-3 54321');
+  await pagina.getByRole('textbox', { name: 'Telefone', exact: true }).fill('(11) 98888-9999');
+  await pagina.getByRole('textbox', { name: 'Telefone de contato' }).fill('(11) 3333-4444');
+  await pagina.waitForTimeout(200);
+});
+
+const antesDeSalvar = gravacoes.length;
+await pagina.getByRole('button', { name: 'Salvar' }).click();
+await pagina.waitForTimeout(1200);
+const salvou = gravacoes.slice(antesDeSalvar);
+const achar = (tabela) => salvou.find((g) => g.tabela.startsWith(tabela));
+console.log(
+  '  gravou o perfil:',
+  achar('perfis')?.corpo?.telefone ?? 'NÃO',
+  '| o CRN por função:',
+  achar('rpc/atualizar_meu_registro')?.corpo?.p_crn ?? 'NÃO',
+  '| o consultório:',
+  achar('tenants')?.corpo?.contato_telefone ?? 'NÃO',
+);
 
 console.log('\nERROS NO CONSOLE:', problemas.length === 0 ? 'nenhum' : problemas.join(' ;; '));
 await navegador.close();

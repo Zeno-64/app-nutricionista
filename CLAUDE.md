@@ -59,8 +59,9 @@ Requisitos v0.2 fechados. Monorepo de pé, com as quatro partes andando:
 - **`apps/web`** — login, rota por perfil, lista de pacientes, cadastro e edição
   com validação, arquivamento, linha do tempo, anamnese e pré-consulta com
   versionamento e comparação, nova avaliação com cálculo ao vivo e memória na
-  tela, evolução com gráfico e tabela comparativa, e editor de modelos de
-  anamnese e pré-consulta.
+  tela, evolução com gráfico e tabela comparativa, editor de modelos de
+  anamnese e pré-consulta, e os dados profissionais que vão no documento e na
+  tela do paciente (RF-05).
 - **`apps/mobile`** — login, rota por perfil, lista e busca de pacientes, ficha
   do paciente com linha do tempo, envio de pré-consulta e liberação de avaliação
   e, para o paciente, as avaliações liberadas com gráfico de evolução, a
@@ -72,7 +73,7 @@ Requisitos v0.2 fechados. Monorepo de pé, com as quatro partes andando:
   (`npm run mobile:navegador`); para instalar no aparelho, o `eas.json` tem os
   perfis de build.
 
-236 testes no workspace, mais 64 asserções no banco. Typecheck limpo nos
+236 testes no workspace, mais 68 asserções no banco. Typecheck limpo nos
 três pacotes, painel e app empacotam, console do navegador sem erro.
 
 ### Três bloqueios que dependem de fora

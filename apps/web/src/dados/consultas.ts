@@ -32,6 +32,51 @@ export async function carregarMembro(usuarioId: string): Promise<Membro | null> 
   return data as Membro | null;
 }
 
+/** RF-05: o consultório, como aparece nos documentos e na tela do paciente. */
+export interface Consultorio {
+  id: string;
+  nome: string;
+  contato_email: string | null;
+  contato_telefone: string | null;
+}
+
+export async function carregarConsultorio(tenantId: string): Promise<Consultorio | null> {
+  const { data, error } = await exigirSupabase()
+    .from('tenants')
+    .select('id, nome, contato_email, contato_telefone')
+    .eq('id', tenantId)
+    .maybeSingle();
+  if (error) throw error;
+  return data as Consultorio | null;
+}
+
+/** Só o proprietário do consultório escreve aqui — a RLS decide, não a tela. */
+export async function salvarConsultorio(
+  tenantId: string,
+  dados: Omit<Consultorio, 'id'>,
+): Promise<void> {
+  const { error } = await exigirSupabase().from('tenants').update(dados).eq('id', tenantId);
+  if (error) throw error;
+}
+
+export async function salvarMeuPerfil(
+  usuarioId: string,
+  dados: { nome: string; telefone: string | null },
+): Promise<void> {
+  const { error } = await exigirSupabase().from('perfis').update(dados).eq('id', usuarioId);
+  if (error) throw error;
+}
+
+/**
+ * RF-05: o CRN vai por função, não por `update` em `membros`. A RLS filtra
+ * linha e não coluna: quem pudesse escrever na própria linha poderia se
+ * promover a proprietário junto.
+ */
+export async function salvarMeuRegistro(crn: string): Promise<void> {
+  const { error } = await exigirSupabase().rpc('atualizar_meu_registro', { p_crn: crn });
+  if (error) throw error;
+}
+
 export interface FiltroPacientes {
   busca?: string;
   incluirArquivados?: boolean;

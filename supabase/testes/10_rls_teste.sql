@@ -667,6 +667,66 @@ $$;
 select teste.sair();
 
 -- ---------------------------------------------------------------------------
+-- RF-05: cada profissional mantém o próprio registro, e só ele
+-- ---------------------------------------------------------------------------
+
+-- A "Ana Segunda" do bloco anterior não é proprietária: é justamente quem a
+-- política de `membros` não deixa escrever.
+select teste.entrar('aaaaaaaa-aaaa-4aaa-8aaa-000000000002');
+
+do $$
+declare
+  v_linhas integer;
+begin
+  perform public.atualizar_meu_registro(' CRN-3 99999 ');
+
+  perform teste.ok(
+    (select crn from public.membros
+      where usuario_id = 'aaaaaaaa-aaaa-4aaa-8aaa-000000000002') = 'CRN-3 99999',
+    'quem não é proprietário grava o próprio CRN, sem espaço em volta'
+  );
+
+  -- O caminho direto continua fechado: é o que impede a promoção a
+  -- proprietário junto com o CRN.
+  update public.membros set papel = 'proprietario'
+    where usuario_id = 'aaaaaaaa-aaaa-4aaa-8aaa-000000000002';
+  get diagnostics v_linhas = row_count;
+
+  perform teste.ok(v_linhas = 0, 'não dá para escrever direto na própria linha de membros');
+  perform teste.ok(
+    (select papel from public.membros
+      where usuario_id = 'aaaaaaaa-aaaa-4aaa-8aaa-000000000002') = 'nutricionista',
+    'o papel continua sendo o que o proprietário definiu'
+  );
+
+  -- E a função só alcança a própria linha.
+  perform teste.ok(
+    (select crn from public.membros
+      where usuario_id = 'aaaaaaaa-aaaa-4aaa-8aaa-000000000001') = 'CRN-3 12345',
+    'o CRN do outro profissional não foi tocado'
+  );
+end;
+$$;
+
+select teste.sair();
+
+-- Quem não tem vínculo nenhum não tem registro para manter.
+select teste.entrar('cccccccc-cccc-4ccc-8ccc-000000000001');
+
+do $$
+begin
+  begin
+    perform public.atualizar_meu_registro('CRN-3 00000');
+    raise exception 'TESTE FALHOU: paciente gravou CRN';
+  exception
+    when insufficient_privilege then null;
+  end;
+end;
+$$;
+
+select teste.sair();
+
+-- ---------------------------------------------------------------------------
 -- Toda tabela com dado clínico tem tenant_id e RLS ligada
 -- ---------------------------------------------------------------------------
 

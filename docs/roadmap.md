@@ -9,8 +9,8 @@ Atualizado em 2026-09-13.
 
 O alicerce está pronto: banco com as regras clínicas garantidas por gatilho e
 RLS, catálogo completo de fórmulas, painel web cobrindo o atendimento inteiro e
-app com as duas áreas de pé. 236 testes no workspace, 64 asserções no banco,
-13 migrations.
+app com as duas áreas de pé. 236 testes no workspace, 68 asserções no banco,
+14 migrations.
 
 O que falta se divide em três grupos, e vale entender a diferença:
 
@@ -50,13 +50,14 @@ percentual de gordura, e cinco dos oito dependem disso.
 
 | O quê | Onde |
 |---|---|
-| Tenants, membros, perfis, pacientes | 13 migrations, esquema aplicado no projeto de desenvolvimento |
+| Tenants, membros, perfis, pacientes | 14 migrations, esquema aplicado no projeto de desenvolvimento |
 | Modelos de formulário, anamneses, avaliações, anexos, consentimentos | idem |
 | RN-01 — `tenant_id` e RLS em toda tabela clínica | teste varre o catálogo do Postgres |
 | RN-02 — gatilho recusa alterar registro finalizado; correção gera nova versão | `nova_versao_avaliacao`, `nova_versao_anamnese` |
 | RN-03, RN-04, RN-08 | políticas e gatilho |
 | RF-03 — o aceite é do próprio paciente, e não se reescreve | política + gatilho de somente inserção |
 | RF-60 — o paciente vê quem cuida dele sem abrir `perfis`, `membros` e `tenants` | `meu_nutricionista()` |
+| RF-05 — cada profissional grava o próprio CRN sem poder se promover | `atualizar_meu_registro()` |
 | RF-41 — `check` recusa fator de atividade em fórmula que já dá GET | dupla trava: banco e TypeScript |
 | RNF-11 — auditoria de criação, alteração, exclusão e visualização | gatilho + `registrar_visualizacao` |
 | Questionário atual da anamnese (§4.4) como modelo padrão | migration de dados |
@@ -83,6 +84,7 @@ percentual de gordura, e cinco dos oito dependem disso.
 | RF-20 a RF-27 | Modelos com 7 tipos de pergunta e condicional; anamnese e pré-consulta com versionamento e comparação |
 | RF-30 a RF-45 | Nova avaliação com cálculo ao vivo e memória na tela |
 | RF-50, RF-51 | Evolução com gráfico e tabela comparativa |
+| RF-05 | Dados profissionais: nome, telefone, CRN e contato do consultório (o logotipo depende do Storage) |
 | RF-62 | Área do paciente com as avaliações liberadas |
 
 ### App (`apps/mobile`)
@@ -138,7 +140,7 @@ não passa por essa conferência é justamente a RLS, que é testada no banco.
 | RF-14 | Anexar exames e documentos, inclusive pela câmera |
 | RF-15 | Fotos de evolução comparáveis entre datas |
 | RF-52 | PDF da avaliação com a identidade visual dele |
-| RF-05 | Cadastro dos dados profissionais (CRN, contato, logo) usados no PDF |
+| RF-05 | O logotipo do consultório, que falta para fechar os dados profissionais — depende do Storage, igual aos anexos |
 | RF-58 | Gráficos de evolução na área do nutricionista do app |
 | RF-36 | Registrar resultado de bioimpedância (a coluna existe, a tela não) |
 

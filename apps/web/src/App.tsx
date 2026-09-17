@@ -4,6 +4,7 @@ import { RotaProtegida } from './autenticacao/RotaProtegida';
 import { Layout } from './componentes/Layout';
 import { Carregando } from './componentes/ui';
 import { Entrar } from './paginas/Entrar';
+import { MeusDados } from './paginas/MeusDados';
 import { Evolucao } from './paginas/Evolucao';
 import { MinhaEvolucao } from './paginas/MinhaEvolucao';
 import { Paciente } from './paginas/Paciente';
@@ -69,6 +70,14 @@ export function App() {
               element={
                 <RotaProtegida perfilExigido="nutricionista">
                   <NovaAnamnese />
+                </RotaProtegida>
+              }
+            />
+            <Route
+              path="/meus-dados"
+              element={
+                <RotaProtegida perfilExigido="nutricionista">
+                  <MeusDados />
                 </RotaProtegida>
               }
             />
