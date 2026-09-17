@@ -473,6 +473,64 @@ begin
 end;
 $$;
 
+-- RF-03: é o próprio paciente que aceita, no primeiro acesso pelo app.
+select teste.entrar('cccccccc-cccc-4ccc-8ccc-000000000001');
+
+do $$
+begin
+  insert into public.consentimentos
+    (tenant_id, paciente_id, usuario_id, tipo, versao_documento, documento_hash)
+  values (
+    '11111111-1111-4111-8111-000000000001',
+    'dddddddd-dddd-4ddd-8ddd-000000000001',
+    'cccccccc-cccc-4ccc-8ccc-000000000001',
+    'lgpd_tratamento_dados', '2026-09-17', 'hash-do-termo'
+  );
+
+  perform teste.ok(
+    (select count(*) from public.consentimentos where versao_documento = '2026-09-17') = 1,
+    'o paciente registra o próprio aceite'
+  );
+
+  -- Aceitar no lugar de outro seria assinar por outra pessoa.
+  begin
+    insert into public.consentimentos
+      (tenant_id, paciente_id, usuario_id, tipo, versao_documento)
+    values (
+      '22222222-2222-4222-8222-000000000001',
+      'dddddddd-dddd-4ddd-8ddd-000000000002',
+      'cccccccc-cccc-4ccc-8ccc-000000000001',
+      'lgpd_tratamento_dados', '2026-09-17'
+    );
+    raise exception 'TESTE FALHOU: aceitou o termo no lugar de outro paciente';
+  exception
+    when insufficient_privilege then null;
+  end;
+
+  -- Nem registrar o aceite em nome de outra conta.
+  begin
+    insert into public.consentimentos
+      (tenant_id, paciente_id, usuario_id, tipo, versao_documento)
+    values (
+      '11111111-1111-4111-8111-000000000001',
+      'dddddddd-dddd-4ddd-8ddd-000000000001',
+      'aaaaaaaa-aaaa-4aaa-8aaa-000000000001',
+      'lgpd_tratamento_dados', '2026-09-17'
+    );
+    raise exception 'TESTE FALHOU: gravou aceite em nome de outra conta';
+  exception
+    when insufficient_privilege then null;
+  end;
+
+  perform teste.ok(
+    (select count(*) from public.consentimentos) = 2,
+    'o paciente lê os próprios aceites, e só eles'
+  );
+end;
+$$;
+
+select teste.sair();
+
 -- ---------------------------------------------------------------------------
 -- RF-21 e RF-22: modelo padrão de anamnese
 -- ---------------------------------------------------------------------------

@@ -9,7 +9,7 @@ Atualizado em 2026-09-13.
 
 O alicerce está pronto: banco com as regras clínicas garantidas por gatilho e
 RLS, catálogo completo de fórmulas, painel web cobrindo o atendimento inteiro e
-app com as duas áreas de pé. 232 testes no workspace, 62 asserções no banco,
+app com as duas áreas de pé. 236 testes no workspace, 64 asserções no banco,
 13 migrations.
 
 O que falta se divide em três grupos, e vale entender a diferença:
@@ -55,6 +55,7 @@ percentual de gordura, e cinco dos oito dependem disso.
 | RN-01 — `tenant_id` e RLS em toda tabela clínica | teste varre o catálogo do Postgres |
 | RN-02 — gatilho recusa alterar registro finalizado; correção gera nova versão | `nova_versao_avaliacao`, `nova_versao_anamnese` |
 | RN-03, RN-04, RN-08 | políticas e gatilho |
+| RF-03 — o aceite é do próprio paciente, e não se reescreve | política + gatilho de somente inserção |
 | RF-60 — o paciente vê quem cuida dele sem abrir `perfis`, `membros` e `tenants` | `meu_nutricionista()` |
 | RF-41 — `check` recusa fator de atividade em fórmula que já dá GET | dupla trava: banco e TypeScript |
 | RNF-11 — auditoria de criação, alteração, exclusão e visualização | gatilho + `registrar_visualizacao` |
@@ -89,6 +90,7 @@ percentual de gordura, e cinco dos oito dependem disso.
 | ID | O quê |
 |---|---|
 | RF-01 | Login e rota por perfil |
+| RF-03 | Aceite do termo de consentimento antes de qualquer tela do paciente |
 | RF-55 | Lista, busca, ficha do paciente e linha do tempo |
 | RF-57 | Enviar pré-consulta e liberar ou esconder avaliação |
 | RF-60 | Paciente vê o próprio cadastro, quem cuida dele e o contato do consultório |
@@ -127,7 +129,6 @@ não passa por essa conferência é justamente a RLS, que é testada no banco.
 | ID | O quê | Por quê agora |
 |---|---|---|
 | RF-02 | Convite do paciente para o app | Precisa de função de servidor: o convite por e-mail usa a chave de service role, que não pode ir para o app nem para o painel. **É o que falta para o ciclo fechar de verdade** — hoje o paciente de demonstração já existe, mas não há como criar um novo |
-| RF-03 | Aceite do termo de consentimento no primeiro acesso | A tabela existe, a tela não. É LGPD, não é opcional |
 
 ### 4. Completar o atendimento
 
@@ -189,7 +190,8 @@ relatório.
 | Paciente fictício na Nutrio com o resultado de cada fórmula | É metade da RN-06 — sem isso nenhuma fórmula é liberada |
 | Resposta da Nutrio ao pedido de portabilidade | Define o formato do importador |
 | Nome do app e identificador nas lojas | Trava a publicação |
-| Prazo de guarda de prontuário do CFN | Define a política de exclusão (RN-05) |
+| **Revisão jurídica do termo de consentimento** | O texto está escrito e funciona, mas não passou por advogado. É o que o paciente aceita antes de usar o app |
+| Prazo de guarda de prontuário do CFN | Define a política de exclusão (RN-05), e é o único ponto vago do termo |
 
 ## Depois do MVP
 

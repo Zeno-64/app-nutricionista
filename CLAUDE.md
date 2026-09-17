@@ -65,13 +65,14 @@ Requisitos v0.2 fechados. Monorepo de pé, com as quatro partes andando:
   do paciente com linha do tempo, envio de pré-consulta e liberação de avaliação
   e, para o paciente, as avaliações liberadas com gráfico de evolução, a
   pré-consulta para responder e o próprio cadastro com o contato de quem cuida
-  dele. O gráfico, a linha do tempo e a lógica do formulário são as do painel,
-  em `@nutri/calculos`. Tem ícone, splash e versão no rodapé próprios — nada
+  dele — tudo atrás do aceite do termo de consentimento (RF-03). O gráfico, a
+  linha do tempo e a lógica do formulário são as do painel, em
+  `@nutri/calculos`. Tem ícone, splash e versão no rodapé próprios — nada
   mais do template do Expo. Roda no Expo Go (`npm run mobile`) ou no navegador
   (`npm run mobile:navegador`); para instalar no aparelho, o `eas.json` tem os
   perfis de build.
 
-232 testes no workspace, mais 62 asserções no banco. Typecheck limpo nos
+236 testes no workspace, mais 64 asserções no banco. Typecheck limpo nos
 três pacotes, painel e app empacotam, console do navegador sem erro.
 
 ### Três bloqueios que dependem de fora
@@ -104,6 +105,10 @@ Pendências com o Kevin:
   versão no rodapé), mas `eas login` e `eas init` pedem uma conta que é dele.
   Passo a passo em `docs/testar-o-app.md`. Ligando o repositório do GitHub ao
   projeto da Expo, os builds seguintes podem ser disparados daqui.
+- **Revisão jurídica do termo de consentimento.** O texto está em
+  `packages/calculos/src/consentimento/termo.ts` e descreve o que o sistema faz
+  de verdade, mas não passou por advogado. Falta também o prazo de guarda de
+  prontuário do CFN, o único ponto onde o texto foge do específico.
 - Prints do questionário de pré-consulta atual.
 - Confirmar se a lista de fórmulas dos prints está completa.
 - Paciente fictício cadastrado na Nutrio com os resultados de cada fórmula e

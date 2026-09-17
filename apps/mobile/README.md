@@ -57,6 +57,11 @@ layout que confere o perfil e manda embora quem entrou na área errada.
 - **A sessão carrega o vínculo (`membros`) junto do perfil.** É de lá que sai o
   `tenant_id` de qualquer gravação do nutricionista. O paciente não tem linha
   em `membros`, e a consulta volta vazia sem erro.
+- **O termo de consentimento é um portão, não uma rota.** Rota se contorna com
+  link direto, e o app abre por link (`scheme`): `/evolucao` chegaria antes do
+  termo. `AceiteDoTermo` envolve a área inteira, então não há caminho por fora.
+  O aceite é por versão — se o texto mudar, quem aceitou o anterior vê a tela
+  de novo, porque foi outro documento que ele leu.
 - **Quem o paciente vê do outro lado quem monta é o banco.** A RLS fecha
   `perfis`, `membros` e `tenants` para ele — e continua fechando: a tela de
   perfil chama `meu_nutricionista()`, uma função que escolhe as colunas no

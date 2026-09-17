@@ -36,3 +36,4 @@ export * from './evolucao/grafico';
 
 export * from './paciente/linhaDoTempo';
 export * from './formulario/anamnese';
+export * from './consentimento/termo';

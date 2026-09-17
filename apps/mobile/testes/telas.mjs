@@ -223,6 +223,8 @@ pagina.on('pageerror', (e) => problemas.push(e.message));
 
 let quemEntrou = null;
 const gravacoes = [];
+/** Aceites do termo, do jeito que o banco os teria: só crescem (RF-03). */
+const consentimentos = [];
 /** As colunas que a tela de perfil pediu do próprio cadastro (RF-60). */
 let selectDoMeuCadastro = null;
 
@@ -284,7 +286,11 @@ await pagina.route(`${SUPABASE}/**`, (rota) => {
   // Guarda o que o app tentou escrever, para o roteiro conferir no fim. Só
   // depois da autenticação: o login também é um POST.
   if (req.method() === 'PATCH' || req.method() === 'POST') {
-    gravacoes.push({ metodo: req.method(), tabela, corpo: req.postDataJSON() });
+    const corpo = req.postDataJSON();
+    gravacoes.push({ metodo: req.method(), tabela, corpo });
+    // O aceite do termo precisa valer para a consulta seguinte: é assim que o
+    // portão abre, e o roteiro tem de atravessar por onde o paciente atravessa.
+    if (tabela === 'consentimentos') consentimentos.push(corpo);
     return json(objeto ? { id: 'nova-pre-consulta' } : []);
   }
 
@@ -320,6 +326,10 @@ await pagina.route(`${SUPABASE}/**`, (rota) => {
         return filtro === null || a[coluna] === filtro.replace(/^eq\./, '');
       }),
     );
+  } else if (tabela === 'consentimentos') {
+    // Começa vazio: o paciente da demonstração nunca aceitou o termo, e é
+    // isso que faz a tela do aceite aparecer (RF-03).
+    dados = [...consentimentos].reverse();
   } else if (tabela === 'respostas_anamnese') {
     dados = respostasDaPreConsulta;
   } else if (tabela === 'membros') {
@@ -408,14 +418,37 @@ console.log('  voltou para:', new URL(pagina.url()).pathname);
 await pagina.getByText('Sair', { exact: true }).last().click();
 await pagina.waitForTimeout(1200);
 
-// 4. Paciente: evolução
+// 4. RF-03: o termo vem antes de qualquer tela do paciente
 await entrar('paciente@demo.test');
 console.log('  rota após entrar como paciente:', new URL(pagina.url()).pathname);
-await print('07-evolucao');
-await pagina.getByText('Gordura corporal', { exact: true }).click();
-await print('08-evolucao-gordura');
+await print('07-termo');
 
-// 5. RF-61: o paciente responde a pré-consulta
+const textoDoPortao = await pagina.locator('body').innerText();
+console.log(
+  '  o termo segura a área do paciente:',
+  textoDoPortao.includes('Li e concordo') && !textoDoPortao.includes('Minha evolução')
+    ? 'sim'
+    : 'NÃO',
+);
+
+await pagina.getByText('Li e concordo', { exact: true }).click();
+await pagina.waitForTimeout(1500);
+
+const aceite = gravacoes.find((g) => g.tabela === 'consentimentos');
+console.log(
+  '  registrou o aceite:',
+  aceite === undefined
+    ? 'NÃO'
+    : `sim, tipo=${aceite.corpo.tipo}, versão=${aceite.corpo.versao_documento}, hash=${aceite.corpo.documento_hash?.slice(0, 8)}…`,
+);
+
+// 5. Paciente: evolução
+console.log('  rota depois de aceitar:', new URL(pagina.url()).pathname);
+await print('08-evolucao');
+await pagina.getByText('Gordura corporal', { exact: true }).click();
+await print('09-evolucao-gordura');
+
+// 6. RF-61: o paciente responde a pré-consulta
 await pagina.getByText('Pré-consulta para responder', { exact: true }).click();
 await pagina.waitForTimeout(1300);
 console.log('  rota da pré-consulta:', new URL(pagina.url()).pathname);
@@ -429,7 +462,7 @@ await pagina.getByText('Sim', { exact: true }).click();
 await pagina.getByText('7', { exact: true }).click();
 await pagina.getByText('Preso', { exact: true }).click();
 await pagina.waitForTimeout(600);
-await print('09-pre-consulta');
+await print('10-pre-consulta');
 
 const gravadas = gravacoes
   .slice(antesDeResponder)
@@ -438,19 +471,19 @@ console.log('  respostas gravadas:', gravadas.map((g) => JSON.stringify(g.corpo.
 
 await pagina.getByText('Enviar respostas', { exact: true }).click();
 await pagina.waitForTimeout(400);
-await print('10-confirmar-envio');
+await print('11-confirmar-envio');
 await pagina.getByText('Enviar', { exact: true }).click();
 await pagina.waitForTimeout(1200);
 
 const finalizou = gravacoes.find((g) => g.tabela === 'rpc/finalizar_pre_consulta');
 console.log('  finalizou pela função do banco:', finalizou === undefined ? 'NÃO' : 'sim');
 
-// 6. RF-60: o paciente vê o próprio cadastro e quem cuida dele
+// 7. RF-60: o paciente vê o próprio cadastro e quem cuida dele
 await pagina.goto(`${BASE}/evolucao`, { waitUntil: 'networkidle' });
 await pagina.getByText('Meu perfil ›', { exact: true }).click();
 await pagina.waitForTimeout(1300);
 console.log('  rota do perfil:', new URL(pagina.url()).pathname);
-await print('11-perfil');
+await print('12-perfil');
 
 const conteudoDoPerfil = await pagina.locator('body').innerText();
 const mostra = (texto) => (conteudoDoPerfil.includes(texto) ? 'sim' : 'NÃO');

@@ -274,6 +274,66 @@ export async function carregarMeuNutricionista(): Promise<Nutricionista[]> {
 }
 
 /**
+ * O mínimo para gravar em nome do paciente: quem ele é e de qual consultório.
+ * O `tenant_id` fica fora de `MeuCadastro` porque não é dado que ele veja — é
+ * o que a linha precisa carregar para a RLS aceitar a gravação (RN-01).
+ */
+export async function meuVinculo(): Promise<{ id: string; tenant_id: string } | null> {
+  const { data, error } = await exigirSupabase()
+    .from('pacientes')
+    .select('id, tenant_id')
+    .maybeSingle();
+  if (error) throw error;
+  return (data as { id: string; tenant_id: string } | null) ?? null;
+}
+
+/**
+ * RF-03: a versão do termo que o paciente já aceitou, ou `null` se nenhuma.
+ *
+ * A RLS devolve só os aceites dele. Pega o mais recente: se o termo mudou de
+ * versão, o aceite antigo não vale mais e a tela volta a aparecer.
+ */
+export async function versaoAceitaDoTermo(): Promise<string | null> {
+  const { data, error } = await exigirSupabase()
+    .from('consentimentos')
+    .select('versao_documento')
+    .eq('tipo', 'lgpd_tratamento_dados')
+    .order('aceito_em', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as { versao_documento: string } | null)?.versao_documento ?? null;
+}
+
+/**
+ * RF-03: registra o aceite. A tabela é somente de inserção, com gatilho — um
+ * consentimento registrado não é reescrito nem apagado (RNF-01).
+ *
+ * `endereco_ip` fica em branco de propósito: o endereço que o app enxerga é o
+ * dele mesmo, não serve de prova. `agente_usuario` vai porque diz de qual
+ * plataforma e versão veio o aceite, o que ajuda o suporte.
+ */
+export async function registrarAceiteDoTermo(parametros: {
+  pacienteId: string;
+  tenantId: string;
+  usuarioId: string;
+  versao: string;
+  hash: string;
+  agente: string;
+}): Promise<void> {
+  const { error } = await exigirSupabase().from('consentimentos').insert({
+    paciente_id: parametros.pacienteId,
+    tenant_id: parametros.tenantId,
+    usuario_id: parametros.usuarioId,
+    tipo: 'lgpd_tratamento_dados',
+    versao_documento: parametros.versao,
+    documento_hash: parametros.hash,
+    agente_usuario: parametros.agente,
+  });
+  if (error) throw error;
+}
+
+/**
  * RNF-11: abrir a ficha de um paciente é acesso a prontuário, e entra na
  * trilha de auditoria. Falhar aqui não pode derrubar a tela — o registro é
  * obrigação nossa, não do nutricionista que só quis ver a ficha.

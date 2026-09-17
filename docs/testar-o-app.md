@@ -166,7 +166,9 @@ chega por e-mail. As versões seguintes aparecem sozinhas para ele.
 Metade dos "defeitos" de um teste guiado é o testador descobrindo sozinho o que
 ainda não existe. Vale mandar algo assim junto com o link:
 
-> Este é um teste, não a versão final. Para entrar, use o e-mail e a senha que
+> Este é um teste, não a versão final. Na primeira vez que entrar como
+> paciente, aparece o termo de consentimento — é exigência da LGPD, e sem
+> aceitar não dá para seguir. Para entrar, use o e-mail e a senha que
 > te mandei — a lista de pacientes já vem com dados de demonstração, pode mexer
 > à vontade que nada aí é real.
 >
