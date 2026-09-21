@@ -1,15 +1,7 @@
 import { Stack } from 'expo-router/stack';
 import { AceiteDoTermo } from '@/componentes/AceiteDoTermo';
 import { AreaProtegida } from '@/componentes/AreaProtegida';
-import { Cores } from '@/constantes/tema';
-
-const CABECALHO = {
-  headerShown: true,
-  headerBackButtonDisplayMode: 'minimal',
-  headerTintColor: Cores.primaria,
-  headerTitleStyle: { color: Cores.texto },
-  headerStyle: { backgroundColor: Cores.cartao },
-} as const;
+import { CabecalhoNativo } from '@/constantes/tema';
 
 export default function LayoutPaciente() {
   return (
@@ -17,11 +9,10 @@ export default function LayoutPaciente() {
       {/* RF-03: o termo vem antes de qualquer tela da área, inclusive de quem
           chegou por link direto. */}
       <AceiteDoTermo>
-        {/* A evolução desenha o próprio cabeçalho; daí em diante o cabeçalho é
-            o nativo, que traz o voltar e o gesto de borda. */}
+        {/* A evolução desenha o próprio cabeçalho; daí em diante é o nativo. */}
         <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="pre-consultas/[id]" options={CABECALHO} />
-          <Stack.Screen name="perfil" options={{ ...CABECALHO, title: 'Meu perfil' }} />
+          <Stack.Screen name="pre-consultas/[id]" options={CabecalhoNativo} />
+          <Stack.Screen name="perfil" options={{ ...CabecalhoNativo, title: 'Meu perfil' }} />
         </Stack>
       </AceiteDoTermo>
     </AreaProtegida>

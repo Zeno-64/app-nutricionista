@@ -28,6 +28,21 @@ export const Espaco = {
  * O espaçamento entre os filhos fica de fora de propósito: é a única coisa que
  * varia de verdade entre um cartão e um item de lista.
  */
+/**
+ * O cabeçalho nativo, igual nas duas áreas.
+ *
+ * Vale usar o do sistema em vez de desenhar um: é dele que vêm o botão de
+ * voltar e o gesto de arrastar da borda, que ninguém deveria reimplementar.
+ * Só as cores são nossas.
+ */
+export const CabecalhoNativo = {
+  headerShown: true,
+  headerBackButtonDisplayMode: 'minimal',
+  headerTintColor: Cores.primaria,
+  headerTitleStyle: { color: Cores.texto },
+  headerStyle: { backgroundColor: Cores.cartao },
+} as const;
+
 export const Superficie = {
   cartao: {
     backgroundColor: Cores.cartao,

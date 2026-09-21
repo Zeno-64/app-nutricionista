@@ -1,7 +1,7 @@
 import { Redirect } from 'expo-router';
 import type { ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Carregando } from '@/componentes/ui';
+import { CarregandoTela } from '@/componentes/ui';
+import { rotaDoPerfil } from '@/sessao/rotas';
 import { useSessao } from '@/sessao/Sessao';
 import type { PerfilTipo } from '@/supabase/tipos';
 
@@ -18,28 +18,10 @@ export function AreaProtegida({
 }) {
   const { usuario, perfil, carregando } = useSessao();
 
-  if (carregando) {
-    return (
-      <View style={estilos.centro}>
-        <Carregando />
-      </View>
-    );
-  }
+  if (carregando) return <CarregandoTela />;
   if (usuario === null) return <Redirect href="/entrar" />;
-  if (perfil === null) {
-    return (
-      <View style={estilos.centro}>
-        <Carregando texto="Carregando o perfil…" />
-      </View>
-    );
-  }
-  if (perfil.tipo !== perfilExigido) {
-    return <Redirect href={perfil.tipo === 'nutricionista' ? '/pacientes' : '/evolucao'} />;
-  }
+  if (perfil === null) return <CarregandoTela texto="Carregando o perfil…" />;
+  if (perfil.tipo !== perfilExigido) return <Redirect href={rotaDoPerfil(perfil.tipo)} />;
 
   return <>{children}</>;
 }
-
-const estilos = StyleSheet.create({
-  centro: { flex: 1, justifyContent: 'center' },
-});

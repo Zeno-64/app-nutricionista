@@ -1,28 +1,15 @@
 import { Redirect } from 'expo-router';
-import { View } from 'react-native';
-import { Carregando } from '@/componentes/ui';
+import { CarregandoTela } from '@/componentes/ui';
+import { rotaDoPerfil } from '@/sessao/rotas';
 import { useSessao } from '@/sessao/Sessao';
 
 /** RF-01: um app só nas lojas; o perfil da conta decide qual área abre. */
 export default function Inicio() {
   const { usuario, perfil, carregando } = useSessao();
 
-  if (carregando) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <Carregando />
-      </View>
-    );
-  }
-
+  if (carregando) return <CarregandoTela />;
   if (usuario === null) return <Redirect href="/entrar" />;
-  if (perfil === null) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <Carregando texto="Carregando o perfil…" />
-      </View>
-    );
-  }
+  if (perfil === null) return <CarregandoTela texto="Carregando o perfil…" />;
 
-  return <Redirect href={perfil.tipo === 'nutricionista' ? '/pacientes' : '/evolucao'} />;
+  return <Redirect href={rotaDoPerfil(perfil.tipo)} />;
 }

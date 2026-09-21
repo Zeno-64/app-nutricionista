@@ -181,6 +181,18 @@ export function Carregando({ texto = 'Carregando…' }: { texto?: string }) {
   );
 }
 
+/**
+ * A espera que ocupa a tela inteira, no meio: enquanto a sessão é conferida e
+ * ainda não há o que desenhar em volta.
+ */
+export function CarregandoTela({ texto }: { texto?: string }) {
+  return (
+    <View style={estilos.telaDeEspera}>
+      <Carregando {...(texto === undefined ? {} : { texto })} />
+    </View>
+  );
+}
+
 export function Cartao({
   children,
   /** Junta os filhos, para cartão de muitos dados curtos em vez de blocos. */
@@ -292,6 +304,7 @@ const estilos = StyleSheet.create({
   avisoAtencao: { borderColor: '#fcd34d', backgroundColor: Cores.atencaoFundo },
   avisoErro: { borderColor: '#fecaca', backgroundColor: Cores.erroFundo },
   carregando: { paddingVertical: Espaco.grande, alignItems: 'center', gap: Espaco.pequeno },
+  telaDeEspera: { flex: 1, justifyContent: 'center' },
   cartao: { ...Superficie.cartao, gap: Espaco.medio },
   cartaoCompacto: { ...Superficie.cartao, gap: Espaco.pequeno },
   secao: {

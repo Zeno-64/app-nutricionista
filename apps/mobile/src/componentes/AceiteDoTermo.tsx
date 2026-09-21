@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Aviso, Botao, Carregando, Texto, Titulo } from '@/componentes/ui';
+import { Aviso, Botao, CarregandoTela, Texto, Titulo } from '@/componentes/ui';
 import { Cores, Espaco } from '@/constantes/tema';
 import { mensagem, useSessao } from '@/sessao/Sessao';
 import { meuVinculo, registrarAceiteDoTermo, versaoAceitaDoTermo } from '@/supabase/consultas';
@@ -72,13 +72,7 @@ export function AceiteDoTermo({ children }: { children: ReactNode }) {
     }
   }, [usuario]);
 
-  if (versaoAceita === undefined) {
-    return (
-      <View style={estilos.centro}>
-        <Carregando />
-      </View>
-    );
-  }
+  if (versaoAceita === undefined) return <CarregandoTela />;
   if (versaoAceita === VERSAO_TERMO) return <>{children}</>;
 
   const jaAceitouOutra = versaoAceita !== null;
@@ -122,7 +116,6 @@ export function AceiteDoTermo({ children }: { children: ReactNode }) {
 
 const estilos = StyleSheet.create({
   tela: { flex: 1, backgroundColor: Cores.fundo },
-  centro: { flex: 1, justifyContent: 'center' },
   conteudo: {
     padding: Espaco.medio,
     paddingBottom: Espaco.grande,
