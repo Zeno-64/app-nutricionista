@@ -1,13 +1,9 @@
-import {
-  agruparPorSecao,
-  pendencias,
-  respondida,
-  type RespostaAnamnese,
-} from '@nutri/calculos';
+import { agruparPorSecao, respondida, type RespostaAnamnese } from '@nutri/calculos';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Aviso, Botao, Campo, Carregando, Escolha, Texto } from '@/componentes/ui';
+import { useCarregamento } from '@/comum/useCarregamento';
 import { Cores, Espaco } from '@/constantes/tema';
 import { mensagem } from '@/sessao/Sessao';
 import {
@@ -15,7 +11,6 @@ import {
   finalizarPreConsulta,
   salvarResposta,
 } from '@/supabase/consultas';
-import type { PreConsulta } from '@/supabase/tipos';
 
 /**
  * RF-61: o paciente responde a pré-consulta que o nutricionista enviou.
@@ -28,41 +23,27 @@ export default function ResponderPreConsulta() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
 
-  const [anamnese, setAnamnese] = useState<PreConsulta | null>(null);
-  const [respostas, setRespostas] = useState<RespostaAnamnese[] | null>(null);
-  const [erro, setErro] = useState<string | null>(null);
   const [gravando, setGravando] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
 
-  const carregar = useCallback(async () => {
-    const dados = await carregarPreConsulta(id);
-    setAnamnese(dados.anamnese);
-    setRespostas(dados.respostas);
-  }, [id]);
+  const carregar = useCallback(() => carregarPreConsulta(id), [id]);
+  const { dados, erro, recarregar, definirDados, definirErro } = useCarregamento(carregar);
 
-  useEffect(() => {
-    let ativo = true;
-    void (async () => {
-      try {
-        await carregar();
-        if (ativo) setErro(null);
-      } catch (falha) {
-        if (ativo) setErro(mensagem(falha));
-      }
-    })();
-    return () => {
-      ativo = false;
-    };
-  }, [carregar]);
-
+  const anamnese = dados?.anamnese ?? null;
+  const respostas = dados?.respostas ?? null;
   const encerrada = anamnese !== null && anamnese.status !== 'rascunho';
 
   /** Mexe só na tela; o banco é avisado quando o campo perde o foco. */
   function mudar(respostaId: string, valor: unknown) {
-    setRespostas((atuais) =>
+    definirDados((atuais) =>
       atuais === null
         ? atuais
-        : atuais.map((r) => (r.id === respostaId ? { ...r, valor } : r)),
+        : {
+            ...atuais,
+            respostas: atuais.respostas.map((r) =>
+              r.id === respostaId ? { ...r, valor } : r,
+            ),
+          },
     );
   }
 
@@ -70,9 +51,9 @@ export default function ResponderPreConsulta() {
     if (encerrada) return;
     try {
       await salvarResposta(respostaId, valor);
-      setErro(null);
+      definirErro(null);
     } catch (falha) {
-      setErro(`Não consegui gravar esta resposta: ${mensagem(falha)}`);
+      definirErro(`Não consegui gravar esta resposta: ${mensagem(falha)}`);
     }
   }
 
@@ -80,11 +61,10 @@ export default function ResponderPreConsulta() {
     setGravando(true);
     try {
       await finalizarPreConsulta(id);
-      await carregar();
+      await recarregar({ discreto: true });
       setConfirmando(false);
-      setErro(null);
     } catch (falha) {
-      setErro(mensagem(falha));
+      definirErro(mensagem(falha));
     } finally {
       setGravando(false);
     }
@@ -110,8 +90,6 @@ export default function ResponderPreConsulta() {
     );
   }
 
-  const obrigatorias = new Set<string>();
-  const faltando = pendencias(respostas, obrigatorias);
   const respondidas = respostas.filter(respondida).length;
   const secoes = agruparPorSecao(respostas);
 
@@ -161,8 +139,13 @@ export default function ResponderPreConsulta() {
           <View style={estilos.rodape}>
             {confirmando ? (
               <View style={estilos.confirmacao}>
+                {/* A pré-consulta não distingue pergunta obrigatória: a
+                    resposta gravada copia enunciado, tipo e opções do modelo
+                    (RN-02), mas não a obrigatoriedade. Enquanto for assim, o
+                    aviso fala do que está em branco, sem prometer conferência
+                    que não existe. */}
                 <Texto suave>
-                  {faltando.length === 0 && respondidas < respostas.length
+                  {respondidas < respostas.length
                     ? 'Ainda há perguntas em branco. Enviar mesmo assim?'
                     : 'Depois de enviar, as respostas não podem mais ser mudadas por aqui.'}
                 </Texto>

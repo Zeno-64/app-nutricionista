@@ -7,9 +7,10 @@ import {
   type ItemLinhaDoTempo,
 } from '@nutri/calculos';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Aviso, Botao, Carregando, Texto } from '@/componentes/ui';
+import { useCarregamento } from '@/comum/useCarregamento';
 import { Cores, Espaco } from '@/constantes/tema';
 import { mensagem, useSessao } from '@/sessao/Sessao';
 import {
@@ -41,9 +42,6 @@ interface Confirmacao {
 export default function FichaDoPaciente() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { usuario, membro } = useSessao();
-  const [ficha, setFicha] = useState<Ficha | null>(null);
-  const [erro, setErro] = useState<string | null>(null);
-  const [atualizando, setAtualizando] = useState(false);
   const [ocupado, setOcupado] = useState(false);
   // A confirmação é uma linha na própria tela, não um diálogo do sistema: o
   // `Alert` do React Native não faz nada no navegador, e é assim que o app é
@@ -64,35 +62,23 @@ export default function FichaDoPaciente() {
     };
   }, [id]);
 
-  useEffect(() => {
-    let ativo = true;
-    void (async () => {
-      try {
-        const dados = await carregar();
-        if (!ativo) return;
-        setFicha(dados);
-        setErro(null);
-        void registrarVisualizacao(id);
-      } catch (falha) {
-        if (ativo) setErro(mensagem(falha));
-      }
-    })();
-    return () => {
-      ativo = false;
-    };
-  }, [carregar, id]);
+  const {
+    dados: ficha,
+    erro,
+    atualizando,
+    recarregar,
+    definirErro,
+  } = useCarregamento(carregar);
 
-  async function aoPuxar() {
-    setAtualizando(true);
-    try {
-      setFicha(await carregar());
-      setErro(null);
-    } catch (falha) {
-      setErro(mensagem(falha));
-    } finally {
-      setAtualizando(false);
-    }
-  }
+  // RNF-11: abrir a ficha é acesso a prontuário e entra na auditoria — uma vez
+  // por ficha aberta, e só depois de ela abrir de verdade. Puxar para
+  // atualizar não é uma visualização nova.
+  const auditada = useRef<string | null>(null);
+  useEffect(() => {
+    if (ficha === null || auditada.current === id) return;
+    auditada.current = id;
+    void registrarVisualizacao(id);
+  }, [ficha, id]);
 
   /** Uma ação que grava: trava a tela, recarrega no fim e nunca engole o erro. */
   async function executar(acao: () => Promise<void>) {
@@ -100,10 +86,9 @@ export default function FichaDoPaciente() {
     setOcupado(true);
     try {
       await acao();
-      setFicha(await carregar());
-      setErro(null);
+      await recarregar({ discreto: true });
     } catch (falha) {
-      setErro(mensagem(falha));
+      definirErro(mensagem(falha));
     } finally {
       setOcupado(false);
     }
@@ -114,18 +99,18 @@ export default function FichaDoPaciente() {
     const { paciente } = ficha;
 
     if (membro === null || usuario === null) {
-      setErro('Sessão sem vínculo de consultório. Entre de novo.');
+      definirErro('Sessão sem vínculo de consultório. Entre de novo.');
       return;
     }
     if (paciente.usuario_id === null) {
-      setErro(
+      definirErro(
         'Este paciente ainda não tem acesso ao app, então não teria como responder. ' +
           'Convide-o pelo painel primeiro.',
       );
       return;
     }
 
-    setErro(null);
+    definirErro(null);
     setConfirmacao({
       chave: 'pre-consulta',
       pergunta: `${paciente.nome} recebe o questionário para responder pelo app.`,
@@ -143,7 +128,7 @@ export default function FichaDoPaciente() {
 
   function aoTrocarLiberacao(avaliacao: AvaliacaoDaFicha) {
     const liberando = avaliacao.liberada_em === null;
-    setErro(null);
+    definirErro(null);
     setConfirmacao({
       chave: avaliacao.id,
       pergunta: liberando
@@ -184,7 +169,9 @@ export default function FichaDoPaciente() {
       <Stack.Screen options={{ title: titulo }} />
       <ScrollView
         contentContainerStyle={estilos.conteudo}
-        refreshControl={<RefreshControl refreshing={atualizando} onRefresh={() => void aoPuxar()} />}
+        refreshControl={
+          <RefreshControl refreshing={atualizando} onRefresh={() => void recarregar()} />
+        }
       >
         {erro !== null && <Aviso tom="erro">{erro}</Aviso>}
 

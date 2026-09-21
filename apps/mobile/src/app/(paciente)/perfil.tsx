@@ -1,12 +1,11 @@
 import { ROTULOS_GRUPO, ROTULOS_SEXO, dataComIdade } from '@nutri/calculos';
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Aviso, Carregando, Cartao, Texto } from '@/componentes/ui';
+import { useCarregamento } from '@/comum/useCarregamento';
 import { Cores, Espaco } from '@/constantes/tema';
-import { mensagem } from '@/sessao/Sessao';
 import { carregarMeuCadastro, carregarMeuNutricionista } from '@/supabase/consultas';
-import type { MeuCadastro, Nutricionista } from '@/supabase/tipos';
 
 /**
  * RF-60: o paciente vê o próprio cadastro e quem cuida dele.
@@ -16,30 +15,15 @@ import type { MeuCadastro, Nutricionista } from '@/supabase/tipos';
  * de oferecer um campo que o banco recusaria.
  */
 export default function Perfil() {
-  const [cadastro, setCadastro] = useState<MeuCadastro | null>(null);
-  const [equipe, setEquipe] = useState<Nutricionista[] | null>(null);
-  const [erro, setErro] = useState<string | null>(null);
-
-  useEffect(() => {
-    let ativo = true;
-    void (async () => {
-      try {
-        const [meu, quemAtende] = await Promise.all([
-          carregarMeuCadastro(),
-          carregarMeuNutricionista(),
-        ]);
-        if (!ativo) return;
-        setCadastro(meu);
-        setEquipe(quemAtende);
-        setErro(null);
-      } catch (falha) {
-        if (ativo) setErro(mensagem(falha));
-      }
-    })();
-    return () => {
-      ativo = false;
-    };
+  const carregar = useCallback(async () => {
+    const [cadastro, equipe] = await Promise.all([
+      carregarMeuCadastro(),
+      carregarMeuNutricionista(),
+    ]);
+    return { cadastro, equipe };
   }, []);
+
+  const { dados, erro } = useCarregamento(carregar);
 
   if (erro !== null) {
     return (
@@ -51,8 +35,9 @@ export default function Perfil() {
     );
   }
 
-  if (equipe === null) return <Carregando />;
+  if (dados === null) return <Carregando />;
 
+  const { cadastro, equipe } = dados;
   // O consultório é o mesmo em toda linha; quem varia é o profissional.
   const consultorio = equipe[0] ?? null;
 

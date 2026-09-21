@@ -8,6 +8,7 @@ import {
 } from '@nutri/calculos';
 import { exigirSupabase } from './cliente';
 import type {
+  Avaliacao,
   AvaliacaoDaFicha,
   MeuCadastro,
   Nutricionista,
@@ -176,6 +177,35 @@ export async function enviarPreConsulta(parametros: {
 
 const COLUNAS_RESPOSTA =
   'id, anamnese_id, pergunta_id, ordem, secao_titulo, enunciado, tipo, opcoes, valor';
+
+// Aqui o `*` seria quase honesto — o paciente vê a avaliação inteira —, mas a
+// lista nominal é o que diz qual coluna a tela usa, e o que quebra o build se
+// uma sair da migration.
+const COLUNAS_MINHA_AVALIACAO = [
+  'id, data_avaliacao, versao, substituida_por_id',
+  'peso, imc, imc_classificacao, percentual_gordura, massa_gorda, massa_livre_gordura',
+  'gasto_energetico_total',
+  'circ_pescoco, circ_braco, circ_cintura, circ_abdomen, circ_quadril, circ_coxa, circ_panturrilha',
+  'dobra_peitoral, dobra_axilar_media, dobra_triceps, dobra_biceps, dobra_subescapular',
+  'dobra_abdominal, dobra_supra_iliaca, dobra_coxa, dobra_panturrilha_medial',
+].join(', ');
+
+/**
+ * RF-62: as avaliações que o paciente pode ver, da mais recente para a mais
+ * antiga.
+ *
+ * Sem filtro de liberação: a RLS já devolve só o que o nutricionista liberou
+ * (RN-03). Repetir o filtro aqui daria a impressão errada de que a regra mora
+ * na tela.
+ */
+export async function listarMinhasAvaliacoes(): Promise<Avaliacao[]> {
+  const { data, error } = await exigirSupabase()
+    .from('avaliacoes')
+    .select(COLUNAS_MINHA_AVALIACAO)
+    .order('data_avaliacao', { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as Avaliacao[];
+}
 
 /**
  * As pré-consultas que o paciente ainda precisa responder.

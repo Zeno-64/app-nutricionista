@@ -6,7 +6,7 @@ import {
   montarSerie,
   type IndicadorId,
 } from '@nutri/calculos';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   Pressable,
   RefreshControl,
@@ -20,82 +20,32 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { GraficoEvolucao } from '@/componentes/GraficoEvolucao';
 import { Aviso, Botao, Carregando, Titulo, Versao } from '@/componentes/ui';
+import { useCarregamento } from '@/comum/useCarregamento';
 import { Cores, Espaco } from '@/constantes/tema';
-import { mensagem, useSessao } from '@/sessao/Sessao';
-import { exigirSupabase } from '@/supabase/cliente';
-import { listarPreConsultasPendentes } from '@/supabase/consultas';
+import { useSessao } from '@/sessao/Sessao';
+import { listarMinhasAvaliacoes, listarPreConsultasPendentes } from '@/supabase/consultas';
 import { pontosDaEvolucao } from '@/supabase/evolucao';
-import type { Avaliacao, PreConsultaResumo } from '@/supabase/tipos';
-
-const COLUNAS =
-  'id, data_avaliacao, versao, substituida_por_id, peso, imc, imc_classificacao, percentual_gordura, massa_gorda, massa_livre_gordura, gasto_energetico_total, circ_pescoco, circ_braco, circ_cintura, circ_abdomen, circ_quadril, circ_coxa, circ_panturrilha, dobra_peitoral, dobra_axilar_media, dobra_triceps, dobra_biceps, dobra_subescapular, dobra_abdominal, dobra_supra_iliaca, dobra_coxa, dobra_panturrilha_medial';
 
 /**
  * RF-62: o paciente vê as avaliações que o nutricionista liberou, com o gráfico
- * de evolução (RF-50).
- *
- * A consulta não filtra por liberação: a RLS já devolve só o que foi liberado
- * (RN-03). Filtrar de novo aqui daria a impressão errada de que a regra mora na
- * tela.
+ * de evolução (RF-50), e a pré-consulta que estiver esperando resposta.
  */
 export default function Evolucao() {
   const { perfil, sair } = useSessao();
   const { width } = useWindowDimensions();
-  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[] | null>(null);
-  const [pendentes, setPendentes] = useState<PreConsultaResumo[]>([]);
   const [indicador, setIndicador] = useState<IndicadorId>('peso');
-  const [erro, setErro] = useState<string | null>(null);
-  const [atualizando, setAtualizando] = useState(false);
 
   const carregar = useCallback(async () => {
-    const [avaliacoes, preConsultas] = await Promise.all([
-      exigirSupabase().from('avaliacoes').select(COLUNAS).order('data_avaliacao', { ascending: false }),
+    const [avaliacoes, pendentes] = await Promise.all([
+      listarMinhasAvaliacoes(),
       listarPreConsultasPendentes(),
     ]);
-    if (avaliacoes.error) throw avaliacoes.error;
-    return {
-      avaliacoes: (avaliacoes.data ?? []) as unknown as Avaliacao[],
-      pendentes: preConsultas,
-    };
+    return { avaliacoes, pendentes };
   }, []);
 
-  const aplicar = useCallback(
-    (dados: { avaliacoes: Avaliacao[]; pendentes: PreConsultaResumo[] }) => {
-      setAvaliacoes(dados.avaliacoes);
-      setPendentes(dados.pendentes);
-    },
-    [],
-  );
-
-  useEffect(() => {
-    let ativo = true;
-    void (async () => {
-      try {
-        const dados = await carregar();
-        if (ativo) {
-          aplicar(dados);
-          setErro(null);
-        }
-      } catch (falha) {
-        if (ativo) setErro(mensagem(falha));
-      }
-    })();
-    return () => {
-      ativo = false;
-    };
-  }, [carregar, aplicar]);
-
-  async function aoPuxar() {
-    setAtualizando(true);
-    try {
-      aplicar(await carregar());
-      setErro(null);
-    } catch (falha) {
-      setErro(mensagem(falha));
-    } finally {
-      setAtualizando(false);
-    }
-  }
+  const { dados, erro, atualizando, recarregar } = useCarregamento(carregar);
+  const avaliacoes = dados?.avaliacoes ?? null;
+  const pendentes = dados?.pendentes ?? [];
 
   const pontos = useMemo(
     () => (avaliacoes === null ? [] : pontosDaEvolucao(avaliacoes)),
@@ -142,7 +92,7 @@ export default function Evolucao() {
         <ScrollView
           contentContainerStyle={estilos.conteudo}
           refreshControl={
-            <RefreshControl refreshing={atualizando} onRefresh={() => void aoPuxar()} />
+            <RefreshControl refreshing={atualizando} onRefresh={() => void recarregar()} />
           }
         >
           {erro !== null && <Aviso tom="erro">{erro}</Aviso>}

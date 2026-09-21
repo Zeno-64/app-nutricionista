@@ -1,56 +1,26 @@
 import { Link } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Aviso, Botao, Campo, Carregando, Texto, Titulo, Versao } from '@/componentes/ui';
+import { useCarregamento } from '@/comum/useCarregamento';
 import { Cores, Espaco } from '@/constantes/tema';
-import { mensagem, useSessao } from '@/sessao/Sessao';
+import { useSessao } from '@/sessao/Sessao';
 import { listarPacientes } from '@/supabase/consultas';
-import type { Paciente } from '@/supabase/tipos';
+
+/** Sem isto, cada tecla digitada na busca vira uma consulta ao banco. */
+const ESPERA_DA_BUSCA = 250;
 
 /** RF-55: lista e busca de pacientes no celular. */
 export default function Pacientes() {
   const { perfil, sair } = useSessao();
   const [busca, setBusca] = useState('');
-  const [pacientes, setPacientes] = useState<Paciente[] | null>(null);
-  const [erro, setErro] = useState<string | null>(null);
-  const [atualizando, setAtualizando] = useState(false);
 
-  const carregar = useCallback((termo: string) => listarPacientes(termo), []);
-
-  useEffect(() => {
-    let ativo = true;
-    const temporizador = setTimeout(() => {
-      void (async () => {
-        try {
-          const lista = await carregar(busca);
-          if (ativo) {
-            setPacientes(lista);
-            setErro(null);
-          }
-        } catch (falha) {
-          if (ativo) setErro(mensagem(falha));
-        }
-      })();
-    }, 250);
-
-    return () => {
-      ativo = false;
-      clearTimeout(temporizador);
-    };
-  }, [busca, carregar]);
-
-  async function aoPuxar() {
-    setAtualizando(true);
-    try {
-      setPacientes(await carregar(busca));
-      setErro(null);
-    } catch (falha) {
-      setErro(mensagem(falha));
-    } finally {
-      setAtualizando(false);
-    }
-  }
+  const carregar = useCallback(() => listarPacientes(busca), [busca]);
+  const { dados: pacientes, erro, atualizando, recarregar } = useCarregamento(
+    carregar,
+    ESPERA_DA_BUSCA,
+  );
 
   return (
     <SafeAreaView style={estilos.tela}>
@@ -81,7 +51,7 @@ export default function Pacientes() {
           keyExtractor={(paciente) => paciente.id}
           contentContainerStyle={estilos.lista}
           refreshControl={
-            <RefreshControl refreshing={atualizando} onRefresh={() => void aoPuxar()} />
+            <RefreshControl refreshing={atualizando} onRefresh={() => void recarregar()} />
           }
           ListEmptyComponent={
             <Text style={estilos.vazio}>
