@@ -31,6 +31,23 @@ falta na tela de login, em vez de quebrar.
 As duas áreas ficam em grupos (`(nutricionista)` e `(paciente)`), cada um com um
 layout que confere o perfil e manda embora quem entrou na área errada.
 
+## Onde fica o quê
+
+| Pasta | O que mora lá |
+|---|---|
+| `src/app/` | As rotas, e só elas. Uma tela por arquivo |
+| `src/componentes/ui.tsx` | Os tijolos da interface: campo, botão, cartão, etiqueta, seção, aviso |
+| `src/componentes/` | Os componentes com regra junto: portão do termo, área protegida, gráfico |
+| `src/comum/` | `useCarregamento`, que é como toda tela busca dados |
+| `src/supabase/` | Tipos das tabelas e **todas** as consultas. Nenhuma tela monta `select` |
+| `src/sessao/` | Sessão, perfil, vínculo e para onde cada perfil vai |
+| `src/constantes/tema.ts` | Cores, espaçamentos, a forma do cartão e o cabeçalho nativo |
+
+A regra que sustenta isso: **o que os dois lados usam mora em
+`@nutri/calculos`** — fórmula, linha do tempo, geometria do gráfico, conversão
+da avaliação em ponto, formatação de número e data, conta de idade, rótulos de
+enum. A tela decide como mostrar; o que mostrar é de lá.
+
 ## Decisões
 
 - **A sessão vive no AsyncStorage,** não no navegador: é o que o supabase-js
@@ -48,7 +65,15 @@ layout que confere o perfil e manda embora quem entrou na área errada.
   painel satisfazem sem conversão.
 - **O cabeçalho da ficha é o nativo,** só ele. A lista continua desenhando o
   próprio, porque tem busca e o botão de sair; da ficha em diante quem manda é
-  o `Stack`, que traz o voltar e o gesto de arrastar da borda de graça.
+  o `Stack`, que traz o voltar e o gesto de arrastar da borda de graça. As
+  opções ficam em `CabecalhoNativo`, no tema, para as duas áreas não
+  divergirem.
+- **Toda tela busca dados pelo mesmo `useCarregamento`.** Ele numera os
+  carregamentos e deixa só o último mandar no estado, o que fecha de uma vez
+  os dois jeitos de errar: a resposta que chega depois de a tela sair, e a
+  busca lenta que volta depois de uma rápida e sobrescreve o resultado certo.
+  Antes cada tela escrevia esse cuidado à mão, e o "puxar para atualizar" não
+  o tinha em nenhuma.
 - **Confirmação na própria tela, não `Alert.alert`.** O `Alert` do React Native
   é um método vazio no `react-native-web`: no navegador o botão não faria nada,
   em silêncio — e é assim que as telas são conferidas aqui e que

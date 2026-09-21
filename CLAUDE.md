@@ -41,8 +41,14 @@ rodar e instalar o app em [docs/testar-o-app.md](docs/testar-o-app.md).
   resolve o `.js` que o TypeScript aceita, e o pacote de cálculos é
   compartilhado entre app e painel.
 - Segredos (chaves do Supabase etc.) só em `.env`, nunca no repositório.
+- **O que o app e o painel usam os dois mora em `@nutri/calculos`,** não copiado
+  em cada um: fórmula, linha do tempo, geometria do gráfico, conversão da
+  avaliação em ponto, formatação de número e data, conta de idade, rótulos de
+  enum. A cópia não incomoda no dia em que é feita; incomoda no dia em que uma
+  das duas muda e o paciente passa a ver um histórico diferente do que o
+  nutricionista vê.
 
-## Estado atual (2026-09-13)
+## Estado atual (2026-09-21)
 
 Requisitos v0.2 fechados. Monorepo de pé, com as quatro partes andando:
 
@@ -51,7 +57,9 @@ Requisitos v0.2 fechados. Monorepo de pé, com as quatro partes andando:
   referência e as medidas que exige. Só calcula o que não tem coeficiente a
   conferir: IMC, RCQ, RCE, massa gorda e MLG, meta calórica e macros, fórmula de
   bolso e os valores manuais. O resto recusa o cálculo, e um teste de catálogo
-  garante que nada escapa disso. Toda saída carrega memória de cálculo.
+  garante que nada escapa disso. Toda saída carrega memória de cálculo. Também
+  guarda o que as duas telas compartilham fora das fórmulas: linha do tempo,
+  gráfico, conversão da avaliação em ponto, formatação, idade e rótulos.
 - **`supabase/`** — migrations de tenants, membros, pacientes, modelos de
   formulário, anamneses, avaliações, anexos, consentimentos e auditoria, com
   RLS, trava de imutabilidade, versionamento e testes. Detalhes em
@@ -68,13 +76,23 @@ Requisitos v0.2 fechados. Monorepo de pé, com as quatro partes andando:
   pré-consulta para responder e o próprio cadastro com o contato de quem cuida
   dele — tudo atrás do aceite do termo de consentimento (RF-03). O gráfico, a
   linha do tempo e a lógica do formulário são as do painel, em
-  `@nutri/calculos`. Tem ícone, splash e versão no rodapé próprios — nada
-  mais do template do Expo. Roda no Expo Go (`npm run mobile`) ou no navegador
+  `@nutri/calculos`. Toda tela busca dados pelo mesmo `useCarregamento`, e todo
+  `select` mora em `src/supabase/consultas.ts` — nenhuma tela monta consulta.
+  Tem ícone, splash e versão no rodapé próprios — nada mais do template do
+  Expo. Roda no Expo Go (`npm run mobile`) ou no navegador
   (`npm run mobile:navegador`); para instalar no aparelho, o `eas.json` tem os
-  perfis de build.
+  perfis de build. Como o código está arrumado: `apps/mobile/README.md`.
 
-236 testes no workspace, mais 68 asserções no banco. Typecheck limpo nos
+264 testes no workspace, mais 68 asserções no banco. Typecheck limpo nos
 três pacotes, painel e app empacotam, console do navegador sem erro.
+
+> **`npm run lint` não roda neste ambiente.** O projeto não tem configuração de
+> ESLint, e o `expo lint` tenta baixar uma na primeira execução — o que a
+> política de rede da sessão em nuvem recusa. Numa máquina com rede aberta ele
+> funciona, mas escreve a configuração no repositório ao rodar, o que não é o
+> que se espera de um comando de conferência. Enquanto não houver decisão sobre
+> isso, quem cobra o mecânico é o `tsc` em modo estrito, agora com
+> `noUnusedLocals` e `noUnusedParameters`.
 
 ### Três bloqueios que dependem de fora
 
