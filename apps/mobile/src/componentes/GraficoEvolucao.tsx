@@ -1,4 +1,4 @@
-import { arredondar, formatarDataCurta, projetarSerie, type SerieEvolucao } from '@nutri/calculos';
+import { comSinal, comUnidade, projetarSerie, type SerieEvolucao } from '@nutri/calculos';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, Line, Path, Text as TextoSvg } from 'react-native-svg';
 import { Cores } from '@/constantes/tema';
@@ -27,7 +27,16 @@ export function GraficoEvolucao({
 
   return (
     <View style={estilos.caixa}>
-      <Svg width={largura} height={altura}>
+      {/* Um gráfico sem rótulo é um retângulo mudo para quem usa leitor de
+          tela, e esta é a tela do paciente — a que mais gente abre sem ser
+          por vontade própria. O painel já descreve o seu (`aria-label`). */}
+      <Svg
+        width={largura}
+        height={altura}
+        accessible
+        accessibilityRole="image"
+        accessibilityLabel={descreverSerie(serie)}
+      >
         {grafico.eixoY.map((marca) => (
           <Line
             key={`linha-${marca.valor}`}
@@ -86,15 +95,19 @@ export function GraficoEvolucao({
   );
 }
 
-/** Rótulo pronto do último ponto, para o resumo acima do gráfico. */
-export function ultimoValor(serie: SerieEvolucao): string {
-  return `${arredondar(serie.ultimo, serie.indicador.casas).toLocaleString('pt-BR', {
-    minimumFractionDigits: serie.indicador.casas,
-    maximumFractionDigits: serie.indicador.casas,
-  })} ${serie.indicador.unidade}`;
+/**
+ * O que o leitor de tela lê no lugar do desenho: de quanto para quanto, em
+ * quantas medidas. É o mesmo que quem enxerga tira do gráfico de relance.
+ */
+function descreverSerie(serie: SerieEvolucao): string {
+  const { rotulo, casas, unidade } = serie.indicador;
+  return (
+    `${rotulo}: de ${comUnidade(serie.primeiro, casas, unidade)} ` +
+    `a ${comUnidade(serie.ultimo, casas, unidade)}, ` +
+    `variação de ${comSinal(serie.variacaoAbsoluta, casas, unidade)} ` +
+    `em ${serie.pontos.length} avaliações.`
+  );
 }
-
-export { formatarDataCurta };
 
 const estilos = StyleSheet.create({
   caixa: { alignItems: 'center' },

@@ -2,6 +2,12 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    // O `tsconfig.base.json` da raiz não dá para estender aqui: o do Expo traz
+    // o que o React Native precisa (jsx, lib, resolução). Estas duas são as
+    // que pegam o import que ficou para trás depois de uma limpeza — sem
+    // ESLint no projeto, é o compilador quem avisa.
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "paths": {
       "@/*": [
         "./src/*"

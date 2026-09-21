@@ -32,6 +32,7 @@ export * from './energia/calcular';
 export * from './energia/meta';
 
 export * from './evolucao/indicadores';
+export * from './evolucao/ponto';
 export * from './evolucao/serie';
 export * from './evolucao/grafico';
 
