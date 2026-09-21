@@ -1,7 +1,13 @@
+import { execFileSync } from 'node:child_process';
+import { createServer } from 'node:http';
+import { readFile } from 'node:fs/promises';
+import { extname, join, normalize } from 'node:path';
 import { abrirChromium } from '../../../testes/navegador.mjs';
 
-const DIR = process.env.SAIDA ?? new URL('./telas', import.meta.url).pathname;
-const BASE = 'http://127.0.0.1:4180';
+const AQUI = new URL('.', import.meta.url).pathname;
+const DIR = process.env.SAIDA ?? join(AQUI, 'telas');
+const PACOTE = process.env.PACOTE ?? join(AQUI, 'telas', 'dist');
+const SUPABASE = 'https://demonstracao.supabase.co';
 
 const NUTRI = 'aaaaaaaa-aaaa-4aaa-8aaa-000000000001';
 const PACIENTE = 'dddddddd-dddd-4ddd-8ddd-000000000001';
@@ -159,6 +165,54 @@ function corpo(url, aceitaObjeto) {
   return aceitaObjeto ? (dados[0] ?? null) : dados;
 }
 
+// --- Empacota e serve o painel, como o roteiro do app faz. Antes disto era
+// preciso deixar o `npm run dev` rodando noutro terminal, e esquecer disso
+// dava um `ERR_CONNECTION_REFUSED` cru, sem dizer o que faltava.
+//
+// As chaves entram falsas de propósito: o navegador não fala com o Supabase
+// aqui — quem responde é a interceptação lá embaixo —, e assim o roteiro não
+// depende de haver um `.env` na máquina.
+if (process.env.PACOTE === undefined) {
+  console.log('Empacotando o painel (demora um pouco na primeira vez)…');
+  execFileSync('npx', ['vite', 'build', '--outDir', PACOTE, '--emptyOutDir'], {
+    cwd: join(AQUI, '..'),
+    stdio: ['ignore', 'ignore', 'inherit'],
+    env: {
+      ...process.env,
+      VITE_SUPABASE_URL: SUPABASE,
+      VITE_SUPABASE_ANON_KEY: 'chave-anonima-de-demonstracao',
+    },
+  });
+}
+
+const TIPOS = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.woff2': 'font/woff2',
+};
+
+// Página só: o que não for arquivo cai no index.html e o React Router resolve.
+const servidor = createServer(async (req, res) => {
+  const caminho = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname));
+  let arquivo = join(PACOTE, caminho);
+  let corpo = await readFile(arquivo).catch(() => null);
+  if (corpo === null) {
+    arquivo = join(PACOTE, 'index.html');
+    corpo = await readFile(arquivo);
+  }
+  res.writeHead(200, { 'content-type': TIPOS[extname(arquivo)] ?? 'application/octet-stream' });
+  res.end(corpo);
+});
+
+await new Promise((pronto) => servidor.listen(0, '127.0.0.1', pronto));
+const BASE = `http://127.0.0.1:${servidor.address().port}`;
+console.log(`\nPainel em ${BASE}\n`);
+
 const navegador = await abrirChromium();
 const pagina = await navegador.newPage({ viewport: { width: 1440, height: 1000 } });
 const problemas = [];
@@ -252,3 +306,4 @@ console.log(
 
 console.log('\nERROS NO CONSOLE:', problemas.length === 0 ? 'nenhum' : problemas.join(' ;; '));
 await navegador.close();
+servidor.close();

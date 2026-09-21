@@ -1,12 +1,17 @@
 # Conferência visual das telas
 
-`telas.mjs` roda o painel de verdade num navegador e percorre as nove telas,
+`telas.mjs` roda o painel de verdade num navegador e percorre as dez telas,
 tirando print de cada uma e reclamando de qualquer erro no console.
 
 ```sh
-npm run dev --workspace @nutri/web -- --port 4180   # num terminal
-node apps/web/testes/telas.mjs                      # noutro
+npm run telas:painel
 ```
+
+Ele mesmo empacota o painel e sobe o servidor, como o roteiro do app faz — não
+é preciso deixar o `npm run dev` rodando noutro terminal. Empacota em vez de
+usar o servidor de desenvolvimento porque assim confere o mesmo pacote que vai
+para o ar. Para repetir sem empacotar de novo, aponte `PACOTE` para um `dist`
+já pronto.
 
 Os prints saem em `apps/web/testes/telas/`, que está no `.gitignore`.
 
