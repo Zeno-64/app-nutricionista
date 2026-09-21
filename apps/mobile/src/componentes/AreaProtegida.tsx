@@ -1,6 +1,6 @@
 import { Redirect } from 'expo-router';
 import type { ReactNode } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Carregando } from '@/componentes/ui';
 import { useSessao } from '@/sessao/Sessao';
 import type { PerfilTipo } from '@/supabase/tipos';
@@ -20,7 +20,7 @@ export function AreaProtegida({
 
   if (carregando) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
+      <View style={estilos.centro}>
         <Carregando />
       </View>
     );
@@ -28,7 +28,7 @@ export function AreaProtegida({
   if (usuario === null) return <Redirect href="/entrar" />;
   if (perfil === null) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
+      <View style={estilos.centro}>
         <Carregando texto="Carregando o perfil…" />
       </View>
     );
@@ -39,3 +39,7 @@ export function AreaProtegida({
 
   return <>{children}</>;
 }
+
+const estilos = StyleSheet.create({
+  centro: { flex: 1, justifyContent: 'center' },
+});

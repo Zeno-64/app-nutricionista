@@ -2,7 +2,7 @@ import { ROTULOS_GRUPO, ROTULOS_SEXO, dataComIdade } from '@nutri/calculos';
 import { useCallback } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Aviso, Carregando, Cartao, Texto } from '@/componentes/ui';
+import { Aviso, Carregando, Cartao, Secao, Texto } from '@/componentes/ui';
 import { useCarregamento } from '@/comum/useCarregamento';
 import { Cores, Espaco } from '@/constantes/tema';
 import { carregarMeuCadastro, carregarMeuNutricionista } from '@/supabase/consultas';
@@ -44,7 +44,7 @@ export default function Perfil() {
   return (
     <SafeAreaView style={estilos.tela} edges={['bottom']}>
       <ScrollView contentContainerStyle={estilos.conteudo}>
-        <Text style={estilos.secao}>Meus dados</Text>
+        <Secao espacoAcima={Espaco.pequeno}>Meus dados</Secao>
         <Cartao>
           {cadastro === null ? (
             <Texto suave>Não encontramos o seu cadastro.</Texto>
@@ -76,9 +76,9 @@ export default function Perfil() {
           )}
         </Cartao>
 
-        <Text style={estilos.secao}>
+        <Secao espacoAcima={Espaco.pequeno}>
           {equipe.length > 1 ? 'Quem cuida de você' : 'Meu nutricionista'}
-        </Text>
+        </Secao>
         {equipe.length === 0 ? (
           <Cartao>
             <Texto suave>Ainda não há um nutricionista ligado à sua conta.</Texto>
@@ -95,7 +95,7 @@ export default function Perfil() {
 
         {consultorio !== null && (
           <>
-            <Text style={estilos.secao}>Consultório</Text>
+            <Secao espacoAcima={Espaco.pequeno}>Consultório</Secao>
             <Cartao>
               <Dado rotulo="Nome" valor={consultorio.consultorio_nome} />
               <Dado rotulo="E-mail" valor={consultorio.consultorio_email} />
@@ -125,13 +125,6 @@ const estilos = StyleSheet.create({
     padding: Espaco.medio,
     paddingBottom: Espaco.grande,
     gap: Espaco.pequeno,
-  },
-  secao: {
-    marginTop: Espaco.pequeno,
-    fontSize: 13,
-    fontWeight: '600',
-    color: Cores.textoSuave,
-    textTransform: 'uppercase',
   },
   dado: { gap: 2 },
   rotulo: { fontSize: 12, color: Cores.textoSuave },

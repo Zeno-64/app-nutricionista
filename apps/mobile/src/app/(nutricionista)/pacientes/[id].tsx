@@ -9,9 +9,9 @@ import {
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Aviso, Botao, Carregando, Texto } from '@/componentes/ui';
+import { Aviso, Botao, Carregando, Cartao, Etiqueta, Secao, Texto, Vazio } from '@/componentes/ui';
 import { useCarregamento } from '@/comum/useCarregamento';
-import { Cores, Espaco } from '@/constantes/tema';
+import { Cores, Espaco, Superficie } from '@/constantes/tema';
 import { mensagem, useSessao } from '@/sessao/Sessao';
 import {
   carregarPaciente,
@@ -181,16 +181,14 @@ export default function FichaDoPaciente() {
           </Aviso>
         )}
 
-        <View style={estilos.cartao}>
+        <Cartao compacto>
           <Text style={estilos.nome}>{paciente.nome}</Text>
           {paciente.objetivo !== null && <Texto suave>{paciente.objetivo}</Texto>}
 
           {paciente.grupos.length > 0 && (
             <View style={estilos.etiquetas}>
               {paciente.grupos.map((grupo) => (
-                <Text key={grupo} style={estilos.etiqueta}>
-                  {ROTULOS_GRUPO[grupo]}
-                </Text>
+                <Etiqueta key={grupo}>{ROTULOS_GRUPO[grupo]}</Etiqueta>
               ))}
             </View>
           )}
@@ -216,7 +214,7 @@ export default function FichaDoPaciente() {
               <Text style={estilos.texto}>{paciente.observacoes}</Text>
             </View>
           )}
-        </View>
+        </Cartao>
 
         {/* RF-57: as duas ações que fazem sentido no celular, entre consultas. */}
         <View style={estilos.acoes}>
@@ -234,10 +232,10 @@ export default function FichaDoPaciente() {
           )}
         </View>
 
-        <Text style={estilos.subtitulo}>Linha do tempo</Text>
+        <Secao>Linha do tempo</Secao>
 
         {itens.length === 0 ? (
-          <Text style={estilos.vazio}>Nenhuma anamnese ou avaliação registrada ainda.</Text>
+          <Vazio>Nenhuma anamnese ou avaliação registrada ainda.</Vazio>
         ) : (
           itens.map((item) => {
             const avaliacao = item.tipo === 'avaliacao' ? avaliacoes.get(item.id) : undefined;
@@ -248,9 +246,9 @@ export default function FichaDoPaciente() {
                 <Text style={estilos.data}>{formatarData(item.data)}</Text>
                 <View style={estilos.linhaItem}>
                   <Text style={estilos.titulo}>{item.titulo}</Text>
-                  {item.status === 'rascunho' && <Text style={estilos.etiqueta}>Rascunho</Text>}
-                  {item.origem === 'nutrio' && <Text style={estilos.etiqueta}>Nutrio</Text>}
-                  {liberada && <Text style={estilos.etiquetaLiberada}>Liberada</Text>}
+                  {item.status === 'rascunho' && <Etiqueta>Rascunho</Etiqueta>}
+                  {item.origem === 'nutrio' && <Etiqueta>Nutrio</Etiqueta>}
+                  {liberada && <Etiqueta destaque>Liberada</Etiqueta>}
                 </View>
                 {item.detalhe !== null && <Text style={estilos.detalhe}>{item.detalhe}</Text>}
 
@@ -331,14 +329,6 @@ const estilos = StyleSheet.create({
     paddingBottom: Espaco.grande,
     gap: Espaco.pequeno,
   },
-  cartao: {
-    backgroundColor: Cores.cartao,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Cores.borda,
-    padding: Espaco.medio,
-    gap: Espaco.pequeno,
-  },
   nome: { fontSize: 20, fontWeight: '600', color: Cores.texto },
   etiquetas: { flexDirection: 'row', flexWrap: 'wrap', gap: Espaco.pequeno },
   dados: { flexDirection: 'row', flexWrap: 'wrap', gap: Espaco.medio, marginTop: 4 },
@@ -349,44 +339,11 @@ const estilos = StyleSheet.create({
   confirmacao: { gap: Espaco.pequeno },
   botoesConfirmacao: { flexDirection: 'row', gap: Espaco.pequeno },
   botaoConfirmacao: { flex: 1 },
-  subtitulo: {
-    marginTop: Espaco.medio,
-    fontSize: 13,
-    fontWeight: '600',
-    color: Cores.textoSuave,
-    textTransform: 'uppercase',
-  },
-  item: {
-    backgroundColor: Cores.cartao,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Cores.borda,
-    padding: Espaco.medio,
-    gap: 2,
-  },
+  item: { ...Superficie.cartao, gap: 2 },
   linhaItem: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: Espaco.pequeno },
   data: { fontSize: 12, color: Cores.textoSuave },
   titulo: { fontSize: 16, fontWeight: '600', color: Cores.texto },
   detalhe: { fontSize: 14, color: Cores.textoSuave },
   rotulo: { fontSize: 12, color: Cores.textoSuave },
   texto: { fontSize: 15, color: Cores.texto },
-  vazio: { textAlign: 'center', color: Cores.textoSuave, paddingVertical: Espaco.grande },
-  etiqueta: {
-    fontSize: 12,
-    color: Cores.textoSuave,
-    backgroundColor: Cores.fundo,
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    overflow: 'hidden',
-  },
-  etiquetaLiberada: {
-    fontSize: 12,
-    color: Cores.primaria,
-    backgroundColor: Cores.primariaClara,
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    overflow: 'hidden',
-  },
 });

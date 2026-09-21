@@ -1,4 +1,4 @@
-import type { AvaliacaoDaLinhaDoTempo } from '@nutri/calculos';
+import type { AvaliacaoDaLinhaDoTempo, GrupoPaciente, Sexo } from '@nutri/calculos';
 
 /** Recorte das tabelas que o app usa. Espelha as migrations de `supabase/`. */
 
@@ -10,12 +10,11 @@ export interface Perfil {
   nome: string;
 }
 
-export type GrupoPaciente =
-  | 'adulto'
-  | 'crianca_adolescente'
-  | 'gestante'
-  | 'lactante'
-  | 'atleta';
+// `grupo_paciente` e `sexo` vêm de `@nutri/calculos`, que é onde as fórmulas
+// os consultam — reescrevê-los aqui é como o `papel_membro` já errou uma vez:
+// duas listas do mesmo enum, e a cópia envelhece calada. Reexportados para
+// quem importa os tipos do app não precisar saber de onde vêm.
+export type { GrupoPaciente, Sexo };
 
 export interface Paciente {
   id: string;
@@ -29,7 +28,7 @@ export interface Paciente {
 /** A ficha traz o cadastro inteiro; a lista se contenta com o recorte acima. */
 export interface PacienteCompleto extends Paciente {
   data_nascimento: string | null;
-  sexo: 'masculino' | 'feminino' | null;
+  sexo: Sexo | null;
   telefone: string | null;
   email: string | null;
   profissao: string | null;

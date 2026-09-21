@@ -2,9 +2,19 @@ import { Link } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Aviso, Botao, Campo, Carregando, Texto, Titulo, Versao } from '@/componentes/ui';
+import {
+  Aviso,
+  Botao,
+  Campo,
+  Carregando,
+  Etiqueta,
+  Texto,
+  Titulo,
+  Vazio,
+  Versao,
+} from '@/componentes/ui';
 import { useCarregamento } from '@/comum/useCarregamento';
-import { Cores, Espaco } from '@/constantes/tema';
+import { Cores, Espaco, Superficie } from '@/constantes/tema';
 import { useSessao } from '@/sessao/Sessao';
 import { listarPacientes } from '@/supabase/consultas';
 
@@ -54,9 +64,9 @@ export default function Pacientes() {
             <RefreshControl refreshing={atualizando} onRefresh={() => void recarregar()} />
           }
           ListEmptyComponent={
-            <Text style={estilos.vazio}>
+            <Vazio>
               {busca === '' ? 'Nenhum paciente cadastrado ainda.' : 'Nenhum paciente com esse nome.'}
-            </Text>
+            </Vazio>
           }
           ListFooterComponent={<Versao />}
           renderItem={({ item }) => (
@@ -69,10 +79,8 @@ export default function Pacientes() {
                 <Text style={estilos.nome}>{item.nome}</Text>
                 <View style={estilos.detalhes}>
                   {item.objetivo !== null && <Text style={estilos.detalhe}>{item.objetivo}</Text>}
-                  {item.origem === 'nutrio' && <Text style={estilos.etiqueta}>Nutrio</Text>}
-                  {item.usuario_id === null && (
-                    <Text style={estilos.etiqueta}>Sem acesso ao app</Text>
-                  )}
+                  {item.origem === 'nutrio' && <Etiqueta>Nutrio</Etiqueta>}
+                  {item.usuario_id === null && <Etiqueta>Sem acesso ao app</Etiqueta>}
                 </View>
               </Pressable>
             </Link>
@@ -90,26 +98,9 @@ const estilos = StyleSheet.create({
   botaoSair: { minWidth: 84 },
   margem: { paddingHorizontal: Espaco.medio },
   lista: { paddingHorizontal: Espaco.medio, paddingBottom: Espaco.grande, gap: Espaco.pequeno },
-  item: {
-    backgroundColor: Cores.cartao,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Cores.borda,
-    padding: Espaco.medio,
-    gap: 4,
-  },
+  item: { ...Superficie.cartao, gap: 4 },
   itemTocado: { opacity: 0.6 },
   nome: { fontSize: 16, fontWeight: '600', color: Cores.texto },
   detalhes: { flexDirection: 'row', flexWrap: 'wrap', gap: Espaco.pequeno },
   detalhe: { fontSize: 13, color: Cores.textoSuave },
-  etiqueta: {
-    fontSize: 12,
-    color: Cores.textoSuave,
-    backgroundColor: Cores.fundo,
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    overflow: 'hidden',
-  },
-  vazio: { textAlign: 'center', color: Cores.textoSuave, paddingVertical: Espaco.grande },
 });

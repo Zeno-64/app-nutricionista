@@ -19,9 +19,19 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { GraficoEvolucao } from '@/componentes/GraficoEvolucao';
-import { Aviso, Botao, Carregando, Titulo, Versao } from '@/componentes/ui';
+import {
+  Aviso,
+  Botao,
+  Carregando,
+  Cartao,
+  Etiqueta,
+  Secao,
+  Titulo,
+  Vazio,
+  Versao,
+} from '@/componentes/ui';
 import { useCarregamento } from '@/comum/useCarregamento';
-import { Cores, Espaco } from '@/constantes/tema';
+import { Cores, Espaco, Superficie } from '@/constantes/tema';
 import { useSessao } from '@/sessao/Sessao';
 import { listarMinhasAvaliacoes, listarPreConsultasPendentes } from '@/supabase/consultas';
 import { pontosDaEvolucao } from '@/supabase/evolucao';
@@ -116,14 +126,14 @@ export default function Evolucao() {
           ))}
 
           {avaliacoes.length === 0 ? (
-            <Text style={estilos.vazio}>
+            <Vazio>
               Nenhuma avaliação liberada ainda. Assim que o seu nutricionista liberar, ela aparece
               aqui.
-            </Text>
+            </Vazio>
           ) : (
             <>
               {serie !== null && (
-                <View style={estilos.cartao}>
+                <Cartao>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <View style={estilos.fichas}>
                       {disponiveis.map((item) => {
@@ -171,7 +181,7 @@ export default function Evolucao() {
                       )}
                     />
                   </View>
-                </View>
+                </Cartao>
               )}
 
               {disponiveis.length === 0 && (
@@ -180,14 +190,12 @@ export default function Evolucao() {
                 </Aviso>
               )}
 
-              <Text style={estilos.subtitulo}>Avaliações</Text>
+              <Secao>Avaliações</Secao>
               {avaliacoes.map((avaliacao) => (
                 <View key={avaliacao.id} style={estilos.item}>
                   <View style={estilos.linhaItem}>
                     <Text style={estilos.data}>{formatarData(avaliacao.data_avaliacao)}</Text>
-                    {avaliacao.versao > 1 && (
-                      <Text style={estilos.etiqueta}>Versão {avaliacao.versao}</Text>
-                    )}
+                    {avaliacao.versao > 1 && <Etiqueta>Versão {avaliacao.versao}</Etiqueta>}
                   </View>
                   <View style={estilos.medidas}>
                     <Medida rotulo="Peso" valor={ouNada(avaliacao.peso, 1, 'kg')} />
@@ -262,14 +270,6 @@ const estilos = StyleSheet.create({
   nomeDoPerfil: { fontSize: 14, color: Cores.textoSuave, flexShrink: 1 },
   irParaPerfil: { fontSize: 14, color: Cores.primaria, fontWeight: '500' },
   conteudo: { paddingHorizontal: Espaco.medio, paddingBottom: Espaco.grande, gap: Espaco.pequeno },
-  cartao: {
-    backgroundColor: Cores.cartao,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Cores.borda,
-    padding: Espaco.medio,
-    gap: Espaco.medio,
-  },
   fichas: { flexDirection: 'row', gap: Espaco.pequeno },
   ficha: {
     borderRadius: 999,
@@ -282,42 +282,16 @@ const estilos = StyleSheet.create({
   fichaTexto: { fontSize: 13, color: Cores.textoSuave },
   fichaTextoAtivo: { fontSize: 13, color: Cores.primaria, fontWeight: '600' },
   resumo: { flexDirection: 'row', flexWrap: 'wrap', gap: Espaco.grande },
-  subtitulo: {
-    marginTop: Espaco.medio,
-    fontSize: 13,
-    fontWeight: '600',
-    color: Cores.textoSuave,
-    textTransform: 'uppercase',
-  },
-  item: {
-    backgroundColor: Cores.cartao,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Cores.borda,
-    padding: Espaco.medio,
-    gap: Espaco.pequeno,
-  },
+  item: { ...Superficie.cartao, gap: Espaco.pequeno },
   linhaItem: { flexDirection: 'row', alignItems: 'center', gap: Espaco.pequeno },
   data: { fontSize: 16, fontWeight: '600', color: Cores.texto },
   medidas: { flexDirection: 'row', flexWrap: 'wrap', gap: Espaco.medio },
   rotuloMedida: { fontSize: 12, color: Cores.textoSuave },
   valorMedida: { fontSize: 15, fontWeight: '500', color: Cores.texto },
-  etiqueta: {
-    fontSize: 12,
-    color: Cores.textoSuave,
-    backgroundColor: Cores.fundo,
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    overflow: 'hidden',
-  },
-  vazio: { textAlign: 'center', color: Cores.textoSuave, paddingVertical: Espaco.grande },
   chamada: {
+    ...Superficie.cartao,
     backgroundColor: Cores.primariaClara,
-    borderRadius: 12,
-    borderWidth: 1,
     borderColor: Cores.primaria,
-    padding: Espaco.medio,
     gap: 4,
   },
   chamadaTocada: { opacity: 0.7 },

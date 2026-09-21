@@ -2,7 +2,7 @@ import { agruparPorSecao, respondida, type RespostaAnamnese } from '@nutri/calcu
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Aviso, Botao, Campo, Carregando, Escolha, Texto } from '@/componentes/ui';
+import { Aviso, Botao, Campo, Carregando, Cartao, Escolha, Secao, Texto } from '@/componentes/ui';
 import { useCarregamento } from '@/comum/useCarregamento';
 import { Cores, Espaco } from '@/constantes/tema';
 import { mensagem } from '@/sessao/Sessao';
@@ -121,16 +121,16 @@ export default function ResponderPreConsulta() {
 
         {secoes.map((grupo) => (
           <View key={grupo.secao} style={estilos.secao}>
-            {grupo.secao !== '' && <Text style={estilos.tituloSecao}>{grupo.secao}</Text>}
+            {grupo.secao !== '' && <Secao espacoAcima={0}>{grupo.secao}</Secao>}
             {grupo.respostas.map((resposta) => (
-              <View key={resposta.id} style={estilos.cartao}>
+              <Cartao key={resposta.id}>
                 <CampoDaResposta
                   resposta={resposta}
                   desabilitado={encerrada}
                   aoMudar={(valor) => mudar(resposta.id, valor)}
                   aoGravar={(valor) => void gravar(resposta.id, valor)}
                 />
-              </View>
+              </Cartao>
             ))}
           </View>
         ))}
@@ -300,19 +300,6 @@ const estilos = StyleSheet.create({
   cabecalho: { gap: 4, marginBottom: Espaco.pequeno },
   andamento: { fontSize: 13, color: Cores.primaria, fontWeight: '600' },
   secao: { gap: Espaco.pequeno, marginTop: Espaco.pequeno },
-  tituloSecao: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Cores.textoSuave,
-    textTransform: 'uppercase',
-  },
-  cartao: {
-    backgroundColor: Cores.cartao,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Cores.borda,
-    padding: Espaco.medio,
-  },
   rodape: { marginTop: Espaco.grande },
   confirmacao: { gap: Espaco.pequeno },
   botoes: { flexDirection: 'row', gap: Espaco.pequeno },

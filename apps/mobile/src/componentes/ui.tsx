@@ -8,7 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Cores, Espaco } from '@/constantes/tema';
+import { Cores, Espaco, Superficie } from '@/constantes/tema';
 
 export function Titulo({ children }: { children: ReactNode }) {
   return <Text style={estilos.titulo}>{children}</Text>;
@@ -181,8 +181,52 @@ export function Carregando({ texto = 'Carregando…' }: { texto?: string }) {
   );
 }
 
-export function Cartao({ children }: { children: ReactNode }) {
-  return <View style={estilos.cartao}>{children}</View>;
+export function Cartao({
+  children,
+  /** Junta os filhos, para cartão de muitos dados curtos em vez de blocos. */
+  compacto = false,
+}: {
+  children: ReactNode;
+  compacto?: boolean;
+}) {
+  return (
+    <View style={compacto ? estilos.cartaoCompacto : estilos.cartao}>{children}</View>
+  );
+}
+
+/**
+ * Título de uma faixa da tela, em versalete: "Linha do tempo", "Meus dados".
+ *
+ * O espaço acima é do chamador porque é decisão de layout: no meio de uma
+ * rolagem longa a faixa precisa respirar, logo abaixo de um cabeçalho não.
+ */
+export function Secao({
+  children,
+  espacoAcima = Espaco.medio,
+}: {
+  children: ReactNode;
+  espacoAcima?: number;
+}) {
+  return <Text style={[estilos.secao, { marginTop: espacoAcima }]}>{children}</Text>;
+}
+
+/** Selo curto ao lado de um item: "Rascunho", "Nutrio", "Liberada". */
+export function Etiqueta({
+  children,
+  /** Em verde, para o que o nutricionista acabou de ligar. */
+  destaque = false,
+}: {
+  children: ReactNode;
+  destaque?: boolean;
+}) {
+  return (
+    <Text style={destaque ? estilos.etiquetaDestaque : estilos.etiqueta}>{children}</Text>
+  );
+}
+
+/** A frase que ocupa o lugar de uma lista vazia. */
+export function Vazio({ children }: { children: ReactNode }) {
+  return <Text style={estilos.vazio}>{children}</Text>;
 }
 
 /**
@@ -248,14 +292,34 @@ const estilos = StyleSheet.create({
   avisoAtencao: { borderColor: '#fcd34d', backgroundColor: Cores.atencaoFundo },
   avisoErro: { borderColor: '#fecaca', backgroundColor: Cores.erroFundo },
   carregando: { paddingVertical: Espaco.grande, alignItems: 'center', gap: Espaco.pequeno },
-  cartao: {
-    backgroundColor: Cores.cartao,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Cores.borda,
-    padding: Espaco.medio,
-    gap: Espaco.medio,
+  cartao: { ...Superficie.cartao, gap: Espaco.medio },
+  cartaoCompacto: { ...Superficie.cartao, gap: Espaco.pequeno },
+  secao: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Cores.textoSuave,
+    textTransform: 'uppercase',
   },
+  etiqueta: {
+    fontSize: 12,
+    color: Cores.textoSuave,
+    backgroundColor: Cores.fundo,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    // Sem isto o fundo arredondado vaza nos cantos, no Android.
+    overflow: 'hidden',
+  },
+  etiquetaDestaque: {
+    fontSize: 12,
+    color: Cores.primaria,
+    backgroundColor: Cores.primariaClara,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    overflow: 'hidden',
+  },
+  vazio: { textAlign: 'center', color: Cores.textoSuave, paddingVertical: Espaco.grande },
   versao: {
     fontSize: 12,
     color: Cores.textoSuave,
