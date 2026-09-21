@@ -1,4 +1,4 @@
-import { ROTULOS_GRUPO, ROTULOS_SEXO, formatarData } from '@nutri/calculos';
+import { ROTULOS_GRUPO, ROTULOS_SEXO, dataComIdade } from '@nutri/calculos';
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -66,14 +66,7 @@ export default function Perfil() {
           ) : (
             <>
               <Dado rotulo="Nome" valor={cadastro.nome} />
-              <Dado
-                rotulo="Nascimento"
-                valor={
-                  cadastro.data_nascimento === null
-                    ? null
-                    : `${formatarData(cadastro.data_nascimento)} · ${idade(cadastro.data_nascimento)} anos`
-                }
-              />
+              <Dado rotulo="Nascimento" valor={dataComIdade(cadastro.data_nascimento)} />
               <Dado
                 rotulo="Sexo"
                 valor={cadastro.sexo === null ? null : ROTULOS_SEXO[cadastro.sexo]}
@@ -139,17 +132,6 @@ function Dado({ rotulo, valor }: { rotulo: string; valor: string | null }) {
       <Text style={estilos.valor}>{valor}</Text>
     </View>
   );
-}
-
-/** Idade em anos completos, contada no fuso local de quem está olhando. */
-function idade(nascimentoIso: string): number {
-  const [ano, mes, dia] = nascimentoIso.slice(0, 10).split('-').map(Number);
-  const hoje = new Date();
-  let anos = hoje.getFullYear() - ano;
-  const aindaNaoFezAniversario =
-    hoje.getMonth() + 1 < mes || (hoje.getMonth() + 1 === mes && hoje.getDate() < dia);
-  if (aindaNaoFezAniversario) anos -= 1;
-  return anos;
 }
 
 const estilos = StyleSheet.create({

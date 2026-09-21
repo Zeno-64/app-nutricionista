@@ -1,3 +1,4 @@
+import { idadeEmAnos } from '@nutri/calculos';
 import type { GrupoPaciente, Paciente } from './tipos';
 import type { Sexo } from '@nutri/calculos';
 
@@ -33,10 +34,10 @@ export const FORMULARIO_PACIENTE_VAZIO: FormularioPaciente = {
   grupos: [],
 };
 
-// Os rótulos dos grupos moram em `@nutri/calculos`, junto do tipo, porque o app
-// do paciente também os mostra. Reexportados para não mexer em quem já importa
-// daqui.
-export { ROTULOS_GRUPO } from '@nutri/calculos';
+// Os rótulos dos grupos e a conta de idade moram em `@nutri/calculos`, junto
+// dos tipos, porque o app do paciente também os usa. Reexportados para não
+// mexer em quem já importa daqui.
+export { ROTULOS_GRUPO, idadeEmAnos } from '@nutri/calculos';
 
 /** Erros por campo, para a tela marcar cada um no lugar certo. */
 export type ErrosPaciente = Partial<Record<keyof FormularioPaciente, string>>;
@@ -68,17 +69,6 @@ export function formatarCpf(cpf: string): string {
   const d = apenasDigitos(cpf).slice(0, 11);
   if (d.length !== 11) return cpf;
   return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
-}
-
-/** Idade em anos completos na data de referência. */
-export function idadeEmAnos(dataNascimento: string, hoje = new Date()): number | null {
-  const nascimento = new Date(`${dataNascimento}T00:00:00`);
-  if (Number.isNaN(nascimento.getTime())) return null;
-
-  let idade = hoje.getFullYear() - nascimento.getFullYear();
-  const mes = hoje.getMonth() - nascimento.getMonth();
-  if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) idade -= 1;
-  return idade;
 }
 
 export function validarPaciente(

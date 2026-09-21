@@ -12,6 +12,8 @@
  * satisfazem sem conversão.
  */
 
+import { formatarNumero } from '../formato';
+
 export type StatusRegistro = 'rascunho' | 'finalizada';
 export type OrigemRegistro = 'local' | 'nutrio';
 
@@ -135,15 +137,3 @@ function rotuloCategoria(categoria: string): string {
   return rotulos[categoria] ?? 'Anexo';
 }
 
-export function formatarNumero(valor: number, casas = 2): string {
-  return valor.toLocaleString('pt-BR', {
-    minimumFractionDigits: casas,
-    maximumFractionDigits: casas,
-  });
-}
-
-/** Data ISO (`2026-03-01`) no formato que se lê no Brasil. */
-export function formatarData(iso: string): string {
-  const [ano, mes, dia] = iso.slice(0, 10).split('-');
-  return `${dia}/${mes}/${ano}`;
-}

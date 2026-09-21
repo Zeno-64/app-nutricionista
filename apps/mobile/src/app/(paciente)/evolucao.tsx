@@ -1,5 +1,7 @@
 import {
-  arredondar,
+  comSinal,
+  comUnidade,
+  formatarData,
   indicadoresComEvolucao,
   montarSerie,
   type IndicadorId,
@@ -196,15 +198,27 @@ export default function Evolucao() {
                   <View style={estilos.resumo}>
                     <Resumo
                       rotulo="Primeira"
-                      valor={formatar(serie.primeiro, serie.indicador.casas, serie.indicador.unidade)}
+                      valor={comUnidade(
+                        serie.primeiro,
+                        serie.indicador.casas,
+                        serie.indicador.unidade,
+                      )}
                     />
                     <Resumo
                       rotulo="Última"
-                      valor={formatar(serie.ultimo, serie.indicador.casas, serie.indicador.unidade)}
+                      valor={comUnidade(
+                        serie.ultimo,
+                        serie.indicador.casas,
+                        serie.indicador.unidade,
+                      )}
                     />
                     <Resumo
                       rotulo="Variação"
-                      valor={comSinal(serie.variacaoAbsoluta, serie.indicador.casas, serie.indicador.unidade)}
+                      valor={comSinal(
+                        serie.variacaoAbsoluta,
+                        serie.indicador.casas,
+                        serie.indicador.unidade,
+                      )}
                     />
                   </View>
                 </View>
@@ -232,7 +246,7 @@ export default function Evolucao() {
                       valor={
                         avaliacao.imc === null
                           ? null
-                          : `${formatar(avaliacao.imc, 1, '')}${
+                          : `${comUnidade(avaliacao.imc, 1, '')}${
                               avaliacao.imc_classificacao !== null
                                 ? ` · ${avaliacao.imc_classificacao}`
                                 : ''
@@ -277,28 +291,9 @@ function Medida({ rotulo, valor }: { rotulo: string; valor: string | null }) {
   );
 }
 
-function formatar(valor: number, casas: number, unidade: string): string {
-  const numero = arredondar(valor, casas).toLocaleString('pt-BR', {
-    minimumFractionDigits: casas,
-    maximumFractionDigits: casas,
-  });
-  return unidade === '' ? numero : `${numero} ${unidade}`;
-}
-
+/** Medida que pode não ter sido tomada: sem valor, a linha não aparece. */
 function ouNada(valor: number | null, casas: number, unidade: string): string | null {
-  return valor === null ? null : formatar(valor, casas, unidade);
-}
-
-/** A diferença sai com sinal; o sentido da mudança quem lê é o nutricionista. */
-function comSinal(valor: number, casas: number, unidade: string): string {
-  const arredondado = arredondar(valor, casas);
-  const sinal = arredondado > 0 ? '+' : arredondado < 0 ? '−' : '';
-  return `${sinal}${formatar(Math.abs(arredondado), casas, unidade)}`;
-}
-
-function formatarData(iso: string): string {
-  const [ano, mes, dia] = iso.slice(0, 10).split('-');
-  return `${dia}/${mes}/${ano}`;
+  return valor === null ? null : comUnidade(valor, casas, unidade);
 }
 
 const estilos = StyleSheet.create({

@@ -14,6 +14,7 @@
 export * from './tipos';
 export * from './erros';
 export * from './numeros';
+export * from './formato';
 export * from './rotulos';
 export * from './validacao';
 
@@ -34,6 +35,7 @@ export * from './evolucao/indicadores';
 export * from './evolucao/serie';
 export * from './evolucao/grafico';
 
+export * from './paciente/idade';
 export * from './paciente/linhaDoTempo';
 export * from './formulario/anamnese';
 export * from './consentimento/termo';

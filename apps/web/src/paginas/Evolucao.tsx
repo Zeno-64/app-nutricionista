@@ -1,5 +1,7 @@
 import {
   arredondar,
+  comSinal,
+  comUnidade,
   compararAvaliacoes,
   indicadoresComEvolucao,
   montarSerie,
@@ -104,12 +106,12 @@ export function Evolucao() {
                 <dl className="flex flex-wrap gap-6 text-sm">
                   <Resumo
                     rotulo="Primeira"
-                    valor={`${formatarNumero(arredondar(serie.primeiro, serie.indicador.casas), serie.indicador.casas)} ${serie.indicador.unidade}`}
+                    valor={comUnidade(serie.primeiro, serie.indicador.casas, serie.indicador.unidade)}
                     detalhe={undefined}
                   />
                   <Resumo
                     rotulo="Última"
-                    valor={`${formatarNumero(arredondar(serie.ultimo, serie.indicador.casas), serie.indicador.casas)} ${serie.indicador.unidade}`}
+                    valor={comUnidade(serie.ultimo, serie.indicador.casas, serie.indicador.unidade)}
                     detalhe={undefined}
                   />
                   <Resumo
@@ -213,12 +215,4 @@ function Resumo({
       </dd>
     </div>
   );
-}
-
-/** Diferença sempre com sinal: o sentido da mudança é leitura do nutricionista. */
-function comSinal(valor: number, casas: number, unidade: string): string {
-  const arredondado = arredondar(valor, casas);
-  const sinal = arredondado > 0 ? '+' : arredondado < 0 ? '−' : '';
-  const numero = formatarNumero(Math.abs(arredondado), casas);
-  return `${sinal}${numero}${unidade === '' ? '' : ` ${unidade}`}`;
 }

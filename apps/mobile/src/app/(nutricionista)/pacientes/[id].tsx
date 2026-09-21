@@ -1,4 +1,7 @@
 import {
+  ROTULOS_GRUPO,
+  ROTULOS_SEXO,
+  dataComIdade,
   formatarData,
   montarLinhaDoTempo,
   type ItemLinhaDoTempo,
@@ -17,7 +20,7 @@ import {
   listarAvaliacoesDaFicha,
   registrarVisualizacao,
 } from '@/supabase/consultas';
-import type { AvaliacaoDaFicha, GrupoPaciente, PacienteCompleto } from '@/supabase/tipos';
+import type { AvaliacaoDaFicha, PacienteCompleto } from '@/supabase/tipos';
 
 interface Ficha {
   paciente: PacienteCompleto;
@@ -199,15 +202,18 @@ export default function FichaDoPaciente() {
             <View style={estilos.etiquetas}>
               {paciente.grupos.map((grupo) => (
                 <Text key={grupo} style={estilos.etiqueta}>
-                  {ROTULOS_GRUPO[grupo] ?? grupo}
+                  {ROTULOS_GRUPO[grupo]}
                 </Text>
               ))}
             </View>
           )}
 
           <View style={estilos.dados}>
-            <Dado rotulo="Nascimento" valor={comIdade(paciente.data_nascimento)} />
-            <Dado rotulo="Sexo" valor={ROTULOS_SEXO[paciente.sexo ?? 'ausente']} />
+            <Dado rotulo="Nascimento" valor={dataComIdade(paciente.data_nascimento)} />
+            <Dado
+              rotulo="Sexo"
+              valor={paciente.sexo === null ? null : ROTULOS_SEXO[paciente.sexo]}
+            />
             <Dado rotulo="Telefone" valor={paciente.telefone} />
             <Dado rotulo="E-mail" valor={paciente.email} />
             <Dado rotulo="Profissão" valor={paciente.profissao} />
@@ -329,37 +335,6 @@ function Dado({ rotulo, valor }: { rotulo: string; valor: string | null }) {
       <Text style={estilos.texto}>{valor}</Text>
     </View>
   );
-}
-
-const ROTULOS_GRUPO: Record<GrupoPaciente, string> = {
-  adulto: 'Adulto',
-  crianca_adolescente: 'Criança ou adolescente',
-  gestante: 'Gestante',
-  lactante: 'Lactante',
-  atleta: 'Atleta',
-};
-
-const ROTULOS_SEXO: Record<string, string | null> = {
-  masculino: 'Masculino',
-  feminino: 'Feminino',
-  ausente: null,
-};
-
-/**
- * A data de nascimento vem com a idade junto: é o que o nutricionista procura
- * na ficha, e várias fórmulas dependem dela.
- */
-function comIdade(nascimento: string | null): string | null {
-  if (nascimento === null) return null;
-  const [ano, mes, dia] = nascimento.slice(0, 10).split('-').map(Number);
-  if (ano === undefined || mes === undefined || dia === undefined) return null;
-
-  const hoje = new Date();
-  let idade = hoje.getFullYear() - ano;
-  const mesAtual = hoje.getMonth() + 1;
-  if (mesAtual < mes || (mesAtual === mes && hoje.getDate() < dia)) idade -= 1;
-
-  return `${formatarData(nascimento)} · ${idade} anos`;
 }
 
 const estilos = StyleSheet.create({
