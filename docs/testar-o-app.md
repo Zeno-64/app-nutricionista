@@ -93,12 +93,29 @@ sem eles nenhum build sabe a que projeto pertence.
 repositório nem para a nuvem. Sem isso o build termina bem e o app abre dizendo
 que falta configurar o Supabase.
 
+Cada comando numa linha só — a barra invertida que quebra linha no bash não
+funciona no PowerShell, que é onde isto costuma ser rodado:
+
 ```sh
-eas env:set --environment preview --visibility plaintext \
-  --name EXPO_PUBLIC_SUPABASE_URL --value "https://igsbxhvoqqpuioajpfpi.supabase.co"
-eas env:set --environment preview --visibility sensitive \
-  --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "<a chave anônima, do .env>"
+eas env:set --environment preview --visibility plaintext --name EXPO_PUBLIC_SUPABASE_URL --value "https://igsbxhvoqqpuioajpfpi.supabase.co"
+
+eas env:set --environment preview --visibility sensitive --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "<a chave anônima, do .env>"
 ```
+
+A chave anônima está no `.env` da raiz do projeto, na linha
+`EXPO_PUBLIC_SUPABASE_ANON_KEY=` — é o texto longo depois do `=`, começando
+por `eyJ`. No PowerShell:
+
+```powershell
+Select-String -Path .env -Pattern 'EXPO_PUBLIC_SUPABASE_ANON_KEY'
+```
+
+Se o `.env` não existir na máquina, ela sai do painel do Supabase, em *Project
+Settings → API Keys*: a chave **`anon` / `public`**, nunca a `service_role`.
+
+Omitir os argumentos também funciona — `eas env:set --environment preview`
+pergunta nome, tipo e valor um a um, e é o caminho mais seguro para colar um
+valor comprido.
 
 O perfil `teste` do `eas.json` aponta para o ambiente `preview`, então é de lá
 que ele lê. `eas env:list --environment preview` confere o que ficou gravado.
