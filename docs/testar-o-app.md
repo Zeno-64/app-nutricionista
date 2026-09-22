@@ -243,12 +243,13 @@ Existe um roteiro que empacota o app, percorre as telas num navegador e tira
 print de cada uma, reclamando de qualquer erro no console:
 
 ```sh
-node apps/mobile/testes/telas.mjs      # app
-node apps/web/testes/telas.mjs         # painel (com o painel rodando na 4180)
+npm run telas:app        # app
+npm run telas:painel     # painel
 ```
 
-É o que se usa para conferir visualmente de uma máquina sem celular à mão. Os
-detalhes estão em `apps/mobile/testes/README.md`.
+Os dois empacotam e sobem o servidor sozinhos — não é preciso deixar nada
+rodando noutro terminal. É o que se usa para conferir visualmente de uma
+máquina sem celular à mão. Os detalhes estão em `apps/mobile/testes/README.md`.
 
 ## O que você vai encontrar hoje
 
